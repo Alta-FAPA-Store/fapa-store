@@ -37,6 +37,21 @@ func (controller *Controller) FindUserByID(c echo.Context) error {
 	return c.JSON(common.NewSuccessResponse(response))
 }
 
+func (controller *Controller) FindUserByUsername(c echo.Context) error {
+	username := c.Param("username")
+
+	user, err := controller.service.FindUserByUsername(username)
+
+	if err != nil {
+		return c.JSON(common.NewErrorBusinessResponse(err))
+	}
+
+	response := response.NewGetUserResponse(*user)
+
+	return c.JSON(common.NewSuccessResponse(response))
+
+}
+
 //FindAllUser Find All User with pagination handler
 func (controller *Controller) FindAllUser(c echo.Context) error {
 
@@ -81,7 +96,7 @@ func (controller *Controller) UpdateUser(c echo.Context) error {
 		return c.JSON(common.NewBadRequestResponse())
 	}
 
-	err := controller.service.UpdateUser(id, updateUserRequest.Name, "modifier", updateUserRequest.Version)
+	err := controller.service.UpdateUser(id, *updateUserRequest.ToUpsertUserSpec(), "modifier", updateUserRequest.Version)
 	if err != nil {
 		return c.JSON(common.NewErrorBusinessResponse(err))
 	}

@@ -24,7 +24,7 @@ import (
 
 	echo "github.com/labstack/echo/v4"
 	"github.com/labstack/gommon/log"
-	"gorm.io/driver/mysql"
+	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
@@ -38,14 +38,22 @@ func newDatabaseConnection(config *config.AppConfig) *gorm.DB {
 		"DB_Name":     os.Getenv("GOHEXAGONAL_DB_NAME"),
 	}
 
-	connectionString := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8&parseTime=True&loc=Local",
+	// connectionString := "host=localhost user=gorm password=gorm dbname=gorm port=9920 sslmode=disable TimeZone=Asia/Shanghai"
+	connectionString := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=Asia/Shanghai",
+		configDB["DB_Host"],
 		configDB["DB_Username"],
 		configDB["DB_Password"],
-		configDB["DB_Host"],
-		configDB["DB_Port"],
-		configDB["DB_Name"])
+		configDB["DB_Name"],
+		configDB["DB_Port"])
 
-	db, e := gorm.Open(mysql.Open(connectionString), &gorm.Config{})
+	// connectionString := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8&parseTime=True&loc=Local",
+	// 	configDB["DB_Username"],
+	// 	configDB["DB_Password"],
+	// 	configDB["DB_Host"],
+	// 	configDB["DB_Port"],
+	// 	configDB["DB_Name"])
+
+	db, e := gorm.Open(postgres.Open(connectionString), &gorm.Config{})
 	if e != nil {
 		panic(e)
 	}

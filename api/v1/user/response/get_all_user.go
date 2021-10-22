@@ -28,10 +28,11 @@ func NewGetAllUserResponse(users []user.User, page int, rowPerPage int) getAllUs
 		var getUserResponse GetUserResponse
 
 		getUserResponse.ID = value.ID
-		getUserResponse.Name = value.Name
+		getUserResponse.Firstname = value.Firstname
+		getUserResponse.Lastname = value.Lastname
+		getUserResponse.Email = value.Email
+		getUserResponse.Phone = value.Phone
 		getUserResponse.Username = value.Username
-		getUserResponse.ModifiedAt = value.ModifiedAt
-		getUserResponse.Version = value.Version
 
 		getAllUserResponse.Users = append(getAllUserResponse.Users, getUserResponse)
 	}
