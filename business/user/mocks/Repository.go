@@ -59,6 +59,11 @@ func (_m *Repository) FindUserByID(id int) (*user.User, error) {
 	return r0, r1
 }
 
+func (_m *Repository) FindUserByUsername(username string) (*user.User, error) {
+
+	return &user.User{}, nil
+}
+
 // FindUserByUsernameAndPassword provides a mock function with given fields: username, password
 func (_m *Repository) FindUserByUsernameAndPassword(username string, password string) (*user.User, error) {
 	ret := _m.Called(username, password)

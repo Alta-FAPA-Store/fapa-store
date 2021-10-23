@@ -14,9 +14,14 @@ type GormRepository struct {
 
 type UserTable struct {
 	ID         int       `gorm:"id;primaryKey;autoIncrement"`
-	Name       string    `gorm:"name"`
-	Username   string    `gorm:"username"`
+	Firstname  string    `gorm:"first_name;type:varchar(200)"`
+	Lastname   string    `gorm:"last_name;type:varchar(200)"`
+	Username   string    `gorm:"username;type:varchar(100);unique_index"`
+	Email      string    `gorm:"email;type:varchar(100);unique_index"`
 	Password   string    `gorm:"password"`
+	Phone      string    `gorm:"phone"`
+	Address    string    `gorm:"address"`
+	Role       string    `gorm:"role;type:varchar(50)"`
 	CreatedAt  time.Time `gorm:"created_at"`
 	CreatedBy  string    `gorm:"created_by"`
 	ModifiedAt time.Time `gorm:"modified_at"`
@@ -28,9 +33,14 @@ func newUserTable(user user.User) *UserTable {
 
 	return &UserTable{
 		user.ID,
-		user.Name,
+		user.Firstname,
+		user.Lastname,
 		user.Username,
+		user.Email,
 		user.Password,
+		user.Phone,
+		user.Address,
+		user.Role,
 		user.CreatedAt,
 		user.CreatedBy,
 		user.ModifiedAt,
@@ -44,9 +54,11 @@ func (col *UserTable) ToUser() user.User {
 	var user user.User
 
 	user.ID = col.ID
-	user.Name = col.Name
+	user.Firstname = col.Firstname
+	user.Lastname = col.Lastname
+	user.Phone = col.Phone
 	user.Username = col.Username
-	user.Password = col.Password
+	user.Email = col.Email
 	user.CreatedAt = col.CreatedAt
 	user.CreatedBy = col.CreatedBy
 	user.ModifiedAt = col.ModifiedAt
@@ -64,19 +76,6 @@ func NewGormDBRepository(db *gorm.DB) *GormRepository {
 }
 
 //FindUserByID If data not found will return nil without error
-func (repo *GormRepository) FindUserByID(id int) (*user.User, error) {
-
-	var userData UserTable
-
-	err := repo.DB.First(&userData, id).Error
-	if err != nil {
-		return nil, err
-	}
-
-	user := userData.ToUser()
-
-	return &user, nil
-}
 
 //FindUserByID If data not found will return nil without error
 func (repo *GormRepository) FindUserByUsernameAndPassword(username string, password string) (*user.User, error) {
@@ -130,10 +129,30 @@ func (repo *GormRepository) UpdateUser(user user.User, currentVersion int) error
 
 	userData := newUserTable(user)
 
-	err := repo.DB.Model(&userData).Updates(UserTable{Name: userData.Name, Version: userData.Version}).Error
+	err := repo.DB.Model(&userData).Updates(UserTable{
+		Firstname: userData.Firstname,
+		Username:  userData.Username,
+		Lastname:  userData.Lastname,
+		Email:     userData.Email,
+		Phone:     userData.Phone,
+		Version:   userData.Version}).Error
 	if err != nil {
 		return err
 	}
 
 	return nil
+}
+
+func (repo *GormRepository) FindUserByUsername(username string) (*user.User, error) {
+	var userData UserTable
+
+	err := repo.DB.Where("username = ?", username).First(&userData).Error
+	if err != nil {
+		return nil, err
+	}
+
+	user := userData.ToUser()
+
+	return &user, nil
+
 }

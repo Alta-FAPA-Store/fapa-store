@@ -14,11 +14,14 @@ import (
 )
 
 const (
-	id       = 1
-	name     = "name"
-	username = "username"
-	password = "password"
-	creator  = "creator"
+	id         = 1
+	first_name = "first_name"
+	last_name  = "last_name"
+	phoneNum   = "0818080"
+	email      = "email"
+	username   = "username"
+	password   = "password"
+	creator    = "creator"
 
 	modifier = "modifier"
 	version  = 1
@@ -37,18 +40,18 @@ func TestMain(m *testing.M) {
 	os.Exit(m.Run())
 }
 
-func TestFindUserByID(t *testing.T) {
+func TestFindUserByUsername(t *testing.T) {
 	t.Run("Expect found the user", func(t *testing.T) {
-		userRepository.On("FindUserByID", mock.AnythingOfType("string")).Return(&userData, nil).Once()
+		userRepository.On("FindUserByUsername", mock.AnythingOfType("string")).Return(&userData, nil).Once()
 
-		user, err := userService.FindUserByID(id)
+		user, err := userService.FindUserByUsername(username)
 
 		assert.Nil(t, err)
 
 		assert.NotNil(t, user)
 
 		assert.Equal(t, id, user.ID)
-		assert.Equal(t, name, user.Name)
+		assert.Equal(t, first_name, user.Firstname)
 		assert.Equal(t, username, user.Username)
 		assert.Equal(t, password, user.Password)
 
@@ -57,7 +60,7 @@ func TestFindUserByID(t *testing.T) {
 	t.Run("Expect user not found", func(t *testing.T) {
 		userRepository.On("FindUserByID", mock.AnythingOfType("string")).Return(nil, business.ErrNotFound).Once()
 
-		user, err := userService.FindUserByID(id)
+		user, err := userService.FindUserByUsername(username)
 
 		assert.NotNil(t, err)
 
@@ -93,7 +96,7 @@ func TestUpdateUserByID(t *testing.T) {
 		userRepository.On("FindUserByID", mock.AnythingOfType("string")).Return(&userData, nil).Once()
 		userRepository.On("UpdateUser", mock.AnythingOfType("user.User"), mock.AnythingOfType("int")).Return(nil).Once()
 
-		err := userService.UpdateUser(id, name, modifier, version)
+		err := userService.UpdateUser(username, user.UpdateUserRequest{}, modifier, version)
 
 		assert.Nil(t, err)
 
@@ -103,7 +106,7 @@ func TestUpdateUserByID(t *testing.T) {
 		userRepository.On("FindUserByID", mock.AnythingOfType("string")).Return(&userData, nil).Once()
 		userRepository.On("UpdateUser", mock.AnythingOfType("user.User"), mock.AnythingOfType("int")).Return(business.ErrInternalServerError).Once()
 
-		err := userService.UpdateUser(id, name, modifier, version)
+		err := userService.UpdateUser(username, user.UpdateUserRequest{}, modifier, version)
 
 		assert.NotNil(t, err)
 
@@ -115,17 +118,22 @@ func setup() {
 
 	userData = user.NewUser(
 		id,
-		name,
+		first_name,
+		last_name,
+		phoneNum,
 		username,
 		password,
+		email,
 		creator,
 		time.Now(),
 	)
 
 	insertUserData = user.InsertUserSpec{
-		Name:     name,
-		Username: username,
-		Password: password,
+		Firstname: first_name,
+		Lastname:  last_name,
+		Phone:     phoneNum,
+		Username:  username,
+		Password:  password,
 	}
 
 	userService = user.NewService(&userRepository)

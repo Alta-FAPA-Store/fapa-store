@@ -5,9 +5,14 @@ import "time"
 //User product User that available to rent or sell
 type User struct {
 	ID         int
-	Name       string
+	Firstname  string
+	Lastname   string
 	Username   string
 	Password   string
+	Role       string
+	Email      string
+	Address    string
+	Phone      string
 	CreatedAt  time.Time
 	CreatedBy  string
 	ModifiedAt time.Time
@@ -18,17 +23,23 @@ type User struct {
 //NewUser create new User
 func NewUser(
 	id int,
-	name string,
+	first_name string,
+	last_name string,
+	phone string,
 	username string,
+	email string,
 	password string,
 	creator string,
 	createdAt time.Time) User {
 
 	return User{
 		ID:         id,
-		Name:       name,
+		Firstname:  first_name,
+		Lastname:   last_name,
 		Username:   username,
 		Password:   password,
+		Phone:      phone,
+		Email:      email,
 		CreatedAt:  createdAt,
 		CreatedBy:  creator,
 		ModifiedAt: createdAt,
@@ -38,11 +49,12 @@ func NewUser(
 }
 
 //ModifyUser update existing User data
-func (oldData *User) ModifyUser(newName string, modifiedAt time.Time, updater string) User {
+func (oldData *User) ModifyUser(update UpdateUserRequest, modifiedAt time.Time, updater string) User {
 	return User{
 		ID:         oldData.ID,
-		Name:       newName,
-		Username:   oldData.Username,
+		Firstname:  update.Firstname,
+		Lastname:   update.Lastname,
+		Username:   update.Username,
 		Password:   oldData.Password,
 		CreatedAt:  oldData.CreatedAt,
 		CreatedBy:  oldData.CreatedBy,

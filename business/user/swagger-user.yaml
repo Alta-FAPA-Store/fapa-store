@@ -13,7 +13,7 @@ info:
 host: "fapa-strore.com"
 basePath: "/v1"
 tags:
-- name: "user"
+- name: "users"
   description: "Operations about user"
 schemes:
 - "https"
@@ -22,7 +22,7 @@ paths:
   /user:
     post:
       tags:
-      - "user"
+      - "users"
       summary: "Create user"
       description: "This can only be done by the logged in user."
       operationId: "createUser"
@@ -40,20 +40,26 @@ paths:
           description: "successful operation"
     get:
       tags:
-        - "user"
+        - "users"
       summary: "Get All user"
       description: "Get All user list"
       operationId: "getAllUser"
       produces:
       - "application/json"
       responses:
-        default:
+        "200":
           description: "successful operation"
+          schema:
+            $ref: "#/definitions/User"
+        "400":
+          description: "Invalid username supplied"
+        "404":
+          description: "User not found"
       deprecated: false
   /user/login:
     get:
       tags:
-      - "user"
+      - "users"
       summary: "Logs user into the system"
       description: ""
       operationId: "loginUser"
@@ -85,7 +91,7 @@ paths:
   /user/logout:
     get:
       tags:
-      - "user"
+      - "users"
       summary: "Logs out current logged in user session"
       description: ""
       operationId: "logoutUser"
@@ -98,7 +104,7 @@ paths:
   /user/{username}:
     get:
       tags:
-      - "user"
+      - "users"
       summary: "Get user by user name"
       description: ""
       operationId: "getUserByName"
@@ -121,7 +127,7 @@ paths:
           description: "User not found"
     put:
       tags:
-      - "user"
+      - "users"
       summary: "Updated user"
       description: "This can only be done by the logged in user."
       operationId: "updateUser"
@@ -129,7 +135,7 @@ paths:
       - "application/xml"
       - "application/json"
       parameters:
-      - name: "username"
+      - name: "id"
         in: "path"
         description: "name that need to be updated"
         required: true
@@ -147,7 +153,7 @@ paths:
           description: "User not found"
     delete:
       tags:
-      - "user"
+      - "users"
       summary: "Delete user"
       description: "This can only be done by the logged in user."
       operationId: "deleteUser"
@@ -165,9 +171,9 @@ paths:
         "404":
           description: "User not found"
 securityDefinitions:
-  petstore_auth:
+  fapastore_auth:
     type: "oauth2"
-    authorizationUrl: "http://petstore.swagger.io/oauth/dialog"
+    authorizationUrl: "http://fapastore.swagger.io/oauth/dialog"
     flow: "implicit"
     scopes:
       write:pets: "modify pets in your account"
@@ -180,6 +186,8 @@ definitions:
   User:
     type: "object"
     properties:
+      id:
+        type: integer
       username:
         type: "string"
       first_name:
@@ -188,10 +196,10 @@ definitions:
         type: "string"
       email:
         type: "string"
-      password:
-        type: "string"
       phone:
         type: "string"
+      version:
+        type: integer
     xml:
       name: "User"
   UserLogin:

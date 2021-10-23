@@ -8,9 +8,21 @@ import (
 
 //InsertUserSpec create user spec
 type InsertUserSpec struct {
-	Name     string `validate:"required"`
-	Username string `validate:"required"`
-	Password string `validate:"required"`
+	Firstname string `validate:"required"`
+	Lastname  string `validate:"required"`
+	Email     string `validate:"required"`
+	Username  string `validate:"required"`
+	Password  string `validate:"required"`
+	Phone     string `validate:"required"`
+}
+
+type UpdateUserRequest struct {
+	Firstname string `validate:"required"`
+	Lastname  string `validate:"required"`
+	Email     string `validate:"required"`
+	Username  string `validate:"required"`
+	Phone     string `validate:"required"`
+	Version   int    `validate:"required"`
 }
 
 //=============== The implementation of those interface put below =======================
@@ -19,15 +31,14 @@ type service struct {
 }
 
 //NewService Construct user service object
-func NewService(repository Repository) Service {
+func NewService(repositoryParam Repository) Service {
 	return &service{
-		repository,
+		repositoryParam,
 	}
 }
 
-//FindUserByID Get user by given ID, return nil if not exist
-func (s *service) FindUserByID(id int) (*User, error) {
-	return s.repository.FindUserByID(id)
+func (s *service) FindUserByUsername(username string) (*User, error) {
+	return s.repository.FindUserByUsername(username)
 }
 
 //FindUserByUsernameAndPassword Get user by given ID, return nil if not exist
@@ -55,9 +66,12 @@ func (s *service) InsertUser(insertUserSpec InsertUserSpec, createdBy string) er
 
 	user := NewUser(
 		1,
-		insertUserSpec.Name,
+		insertUserSpec.Firstname,
+		insertUserSpec.Lastname,
+		insertUserSpec.Phone,
 		insertUserSpec.Username,
 		insertUserSpec.Password,
+		insertUserSpec.Email,
 		createdBy,
 		time.Now(),
 	)
@@ -71,9 +85,10 @@ func (s *service) InsertUser(insertUserSpec InsertUserSpec, createdBy string) er
 }
 
 //UpdateUser will update found user, if not exists will be return error
-func (s *service) UpdateUser(id int, name string, modifiedBy string, currentVersion int) error {
+func (s *service) UpdateUser(username string, update UpdateUserRequest, modifiedBy string, currentVersion int) error {
 
-	user, err := s.repository.FindUserByID(id)
+	user, err := s.repository.FindUserByUsername(username)
+
 	if err != nil {
 		return err
 	} else if user == nil {
@@ -82,7 +97,7 @@ func (s *service) UpdateUser(id int, name string, modifiedBy string, currentVers
 		return business.ErrHasBeenModified
 	}
 
-	modifiedUser := user.ModifyUser(name, time.Now(), modifiedBy)
+	modifiedUser := user.ModifyUser(update, time.Now(), modifiedBy)
 
 	return s.repository.UpdateUser(modifiedUser, currentVersion)
 }

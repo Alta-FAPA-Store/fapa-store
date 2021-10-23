@@ -6,7 +6,6 @@ import (
 	"go-hexagonal/api/v1/user/request"
 	"go-hexagonal/api/v1/user/response"
 	"go-hexagonal/business/user"
-	"strconv"
 
 	echo "github.com/labstack/echo/v4"
 )
@@ -23,11 +22,11 @@ func NewController(service user.Service) *Controller {
 	}
 }
 
-//GetItemByID Get item by ID echo handler
-func (controller *Controller) FindUserByID(c echo.Context) error {
-	id, _ := strconv.Atoi(c.Param("id"))
+func (controller *Controller) FindUserByUsername(c echo.Context) error {
+	username := c.Param("username")
 
-	user, err := controller.service.FindUserByID(id)
+	user, err := controller.service.FindUserByUsername(username)
+
 	if err != nil {
 		return c.JSON(common.NewErrorBusinessResponse(err))
 	}
@@ -35,6 +34,7 @@ func (controller *Controller) FindUserByID(c echo.Context) error {
 	response := response.NewGetUserResponse(*user)
 
 	return c.JSON(common.NewSuccessResponse(response))
+
 }
 
 //FindAllUser Find All User with pagination handler
@@ -73,7 +73,7 @@ func (controller *Controller) InsertUser(c echo.Context) error {
 
 // UpdateUser update existing user handler
 func (controller *Controller) UpdateUser(c echo.Context) error {
-	id, _ := strconv.Atoi(c.Param("id"))
+	username := c.Param("username")
 
 	updateUserRequest := new(request.UpdateUserRequest)
 
@@ -81,7 +81,9 @@ func (controller *Controller) UpdateUser(c echo.Context) error {
 		return c.JSON(common.NewBadRequestResponse())
 	}
 
-	err := controller.service.UpdateUser(id, updateUserRequest.Name, "modifier", updateUserRequest.Version)
+	//fmt.Println(updateUserRequest.Version)
+
+	err := controller.service.UpdateUser(username, *updateUserRequest.ToUpsertUserSpec(), "modifier", updateUserRequest.Version)
 	if err != nil {
 		return c.JSON(common.NewErrorBusinessResponse(err))
 	}
