@@ -25,7 +25,7 @@ func RegisterPath(e *echo.Echo, authController *auth.Controller, userController 
 	userV1.GET("/:username", userController.FindUserByUsername)
 	userV1.GET("", userController.FindAllUser)
 	userV1.POST("", userController.InsertUser)
-	userV1.PUT("/:id", userController.UpdateUser)
+	userV1.PUT("/:username", userController.UpdateUser)
 
 	//pet with Versioning endpoint
 	petV1 := e.Group("v1/pets")

@@ -12,6 +12,7 @@ type GetUserResponse struct {
 	Email     string `json:"email"`
 	Username  string `json:"username"`
 	Phone     string `json:"phone"`
+	Version   int    `json:"version"`
 }
 
 //NewGetUserResponse construct GetUserResponse
@@ -23,6 +24,7 @@ func NewGetUserResponse(user user.User) *GetUserResponse {
 	getUserResponse.Lastname = user.Lastname
 	getUserResponse.Email = user.Email
 	getUserResponse.Username = user.Username
+	getUserResponse.Version = user.Version
 
 	return &getUserResponse
 }

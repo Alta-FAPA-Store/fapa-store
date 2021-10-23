@@ -22,7 +22,7 @@ type UpdateUserRequest struct {
 	Email     string `validate:"required"`
 	Username  string `validate:"required"`
 	Phone     string `validate:"required"`
-	Version   string `validate:"required"`
+	Version   int    `validate:"required"`
 }
 
 //=============== The implementation of those interface put below =======================
@@ -37,10 +37,6 @@ func NewService(repositoryParam Repository) Service {
 	}
 }
 
-//FindUserByID Get user by given ID, return nil if not exist
-func (s *service) FindUserByID(id int) (*User, error) {
-	return s.repository.FindUserByID(id)
-} //
 func (s *service) FindUserByUsername(username string) (*User, error) {
 	return s.repository.FindUserByUsername(username)
 }
@@ -89,9 +85,10 @@ func (s *service) InsertUser(insertUserSpec InsertUserSpec, createdBy string) er
 }
 
 //UpdateUser will update found user, if not exists will be return error
-func (s *service) UpdateUser(id int, update UpdateUserRequest, modifiedBy string, currentVersion int) error {
+func (s *service) UpdateUser(username string, update UpdateUserRequest, modifiedBy string, currentVersion int) error {
 
-	user, err := s.repository.FindUserByID(id)
+	user, err := s.repository.FindUserByUsername(username)
+
 	if err != nil {
 		return err
 	} else if user == nil {

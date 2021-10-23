@@ -21,6 +21,7 @@ func (req *UpdateUserRequest) ToUpsertUserSpec() *user.UpdateUserRequest {
 	updateUserRequest.Email = req.Email
 	updateUserRequest.Username = req.Username
 	updateUserRequest.Phone = req.Phone
+	updateUserRequest.Version = req.Version
 
 	return &updateUserRequest
 }

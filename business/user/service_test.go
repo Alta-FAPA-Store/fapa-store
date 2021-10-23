@@ -40,11 +40,11 @@ func TestMain(m *testing.M) {
 	os.Exit(m.Run())
 }
 
-func TestFindUserByID(t *testing.T) {
+func TestFindUserByUsername(t *testing.T) {
 	t.Run("Expect found the user", func(t *testing.T) {
-		userRepository.On("FindUserByID", mock.AnythingOfType("string")).Return(&userData, nil).Once()
+		userRepository.On("FindUserByUsername", mock.AnythingOfType("string")).Return(&userData, nil).Once()
 
-		user, err := userService.FindUserByID(id)
+		user, err := userService.FindUserByUsername(username)
 
 		assert.Nil(t, err)
 
@@ -60,7 +60,7 @@ func TestFindUserByID(t *testing.T) {
 	t.Run("Expect user not found", func(t *testing.T) {
 		userRepository.On("FindUserByID", mock.AnythingOfType("string")).Return(nil, business.ErrNotFound).Once()
 
-		user, err := userService.FindUserByID(id)
+		user, err := userService.FindUserByUsername(username)
 
 		assert.NotNil(t, err)
 
@@ -96,7 +96,7 @@ func TestUpdateUserByID(t *testing.T) {
 		userRepository.On("FindUserByID", mock.AnythingOfType("string")).Return(&userData, nil).Once()
 		userRepository.On("UpdateUser", mock.AnythingOfType("user.User"), mock.AnythingOfType("int")).Return(nil).Once()
 
-		err := userService.UpdateUser(id, user.UpdateUserRequest{}, modifier, version)
+		err := userService.UpdateUser(username, user.UpdateUserRequest{}, modifier, version)
 
 		assert.Nil(t, err)
 
@@ -106,7 +106,7 @@ func TestUpdateUserByID(t *testing.T) {
 		userRepository.On("FindUserByID", mock.AnythingOfType("string")).Return(&userData, nil).Once()
 		userRepository.On("UpdateUser", mock.AnythingOfType("user.User"), mock.AnythingOfType("int")).Return(business.ErrInternalServerError).Once()
 
-		err := userService.UpdateUser(id, user.UpdateUserRequest{}, modifier, version)
+		err := userService.UpdateUser(username, user.UpdateUserRequest{}, modifier, version)
 
 		assert.NotNil(t, err)
 

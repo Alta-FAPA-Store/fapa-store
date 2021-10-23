@@ -76,19 +76,6 @@ func NewGormDBRepository(db *gorm.DB) *GormRepository {
 }
 
 //FindUserByID If data not found will return nil without error
-func (repo *GormRepository) FindUserByID(id int) (*user.User, error) {
-
-	var userData UserTable
-
-	err := repo.DB.First(&userData, id).Error
-	if err != nil {
-		return nil, err
-	}
-
-	user := userData.ToUser()
-
-	return &user, nil
-}
 
 //FindUserByID If data not found will return nil without error
 func (repo *GormRepository) FindUserByUsernameAndPassword(username string, password string) (*user.User, error) {
