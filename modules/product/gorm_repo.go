@@ -13,15 +13,17 @@ type GormRepository struct {
 
 type ProductTable struct {
 	gorm.Model
-	ID          int       `gorm:"id"`
-	Name        string    `gorm:"name"`
-	Price       int       `gorm:"price"`
-	Description int       `gorm:"description"`
-	Slug        string    `gorm:"slug"`
-	Stock       string    `gorm:"stock"`
-	ModifiedAt  time.Time `gorm:"modified_at"`
-	ModifiedBy  string    `gorm:"modified_by"`
-	Version     int       `gorm:"version"`
+	ID                    int                     `gorm:"id"`
+	ProductGalleriesTable []ProductGalleriesTable `gorm:"foreignKey:ProductTableID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL"`
+	ProductCategory       []ProductCategoryTable  `gorm:"foreignKey:ProductID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL"`
+	Name                  string                  `gorm:"name"`
+	Price                 int                     `gorm:"price"`
+	Description           int                     `gorm:"description"`
+	Slug                  string                  `gorm:"slug"`
+	Stock                 string                  `gorm:"stock"`
+	ModifiedAt            time.Time               `gorm:"modified_at"`
+	ModifiedBy            string                  `gorm:"modified_by"`
+	Version               int                     `gorm:"version"`
 }
 
 type CategoryTable struct {
@@ -34,19 +36,21 @@ type CategoryTable struct {
 }
 
 type ProductCategoryTable struct {
-	ID         int `gorm:"id"`
-	CategoryID int `gorm:"category_id"`
-	ProductID  int `gorm:"product_id"`
+	ID         int           `gorm:"id"`
+	CategoryID int           `gorm:"category_id"`
+	ProductID  int           `gorm:"product_id"`
+	Category   CategoryTable `gorm:"foreignKey:CategoryID"`
+	Product    ProductTable  `gorm:"foreignKey:ProductID"`
 	gorm.Model
 }
 
 type ProductGalleriesTable struct {
-	ID         int       `gorm:"id"`
-	ProductID  int       `gorm:"product_id"`
-	URL        string    `gorm:"url"`
-	IsFeatured string    `gorm:"is_featured"`
-	ModifiedAt time.Time `gorm:"modified_at"`
-	ModifiedBy string    `gorm:"modified_by"`
+	ID             int       `gorm:"id"`
+	ProductTableID int       `gorm:"product_id"`
+	URL            string    `gorm:"url"`
+	IsFeatured     string    `gorm:"is_featured"`
+	ModifiedAt     time.Time `gorm:"modified_at"`
+	ModifiedBy     string    `gorm:"modified_by"`
 	gorm.Model
 	Version int `gorm:"version"`
 }
