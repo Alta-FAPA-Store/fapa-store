@@ -1,6 +1,7 @@
 package migration
 
 import (
+	"go-hexagonal/modules/cart"
 	"go-hexagonal/modules/pet"
 	"go-hexagonal/modules/user"
 
@@ -8,5 +9,5 @@ import (
 )
 
 func InitMigrate(db *gorm.DB) {
-	db.AutoMigrate(&user.UserTable{}, &pet.PetTable{})
+	db.AutoMigrate(&user.UserTable{}, &pet.PetTable{}, &cart.Cart{}, &cart.CartDetails{})
 }
