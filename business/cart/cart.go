@@ -34,7 +34,7 @@ func NewCart(userId int, isCheckout bool, createdAt time.Time) Cart {
 	}
 }
 
-func newCartDetails(cartId int, productId int, quantity int, createdAt time.Time) CartDetails {
+func NewCartDetails(cartId int, productId int, quantity int, createdAt time.Time) CartDetails {
 	return CartDetails{
 		CartId:    cartId,
 		ProductId: productId,

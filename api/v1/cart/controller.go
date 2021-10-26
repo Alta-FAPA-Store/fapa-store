@@ -29,6 +29,10 @@ func (controller *Controller) FindCartByUserId(c echo.Context) error {
 		return c.JSON(common.NewErrorBusinessResponse(err))
 	}
 
+	if cart == nil {
+		return c.JSON(common.NewSuccessResponseWithoutData())
+	}
+
 	response := response.NewGetCartResponse(*cart)
 
 	return c.JSON(common.NewSuccessResponse(response))
@@ -58,6 +62,22 @@ func (controller *Controller) DeleteCartDetails(c echo.Context) error {
 	}
 
 	err := controller.service.DeleteCartDetails(*deleteCartDetailsRequest.ToUpsetDeleteCartDetailsSpec(deleteCartDetailsRequest.CartId, deleteCartDetailsRequest.ProductId))
+
+	if err != nil {
+		return c.JSON(common.NewErrorBusinessResponse(err))
+	}
+
+	return c.JSON(common.NewSuccessResponseWithoutData())
+}
+
+func (controller *Controller) UpdateQuantityCartDetails(c echo.Context) error {
+	updateCartDetailsResponse := new(request.UpdateCartDetailsResponse)
+
+	if err := c.Bind(updateCartDetailsResponse); err != nil {
+		return c.JSON(common.NewBadRequestResponse())
+	}
+
+	err := controller.service.UpdateQuantityCartDetails(*updateCartDetailsResponse.ToUpsertUpdateCartDetailsSpec())
 
 	if err != nil {
 		return c.JSON(common.NewErrorBusinessResponse(err))

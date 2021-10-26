@@ -22,6 +22,10 @@ import (
 	cartService "go-hexagonal/business/cart"
 	cartRepository "go-hexagonal/modules/cart"
 
+	transactionController "go-hexagonal/api/v1/transaction"
+	transactionService "go-hexagonal/business/transaction"
+	transactionRepository "go-hexagonal/modules/transaction"
+
 	"os"
 	"os/signal"
 	"time"
@@ -107,11 +111,20 @@ func main() {
 	//initiate cart controller
 	cartController := cartController.NewController(cartService)
 
+	//initiate transaction repository
+	transactionRepo := transactionRepository.NewGormDBRepository(dbConnection)
+
+	//initiate transaction service
+	transactionService := transactionService.NewService(transactionRepo)
+
+	//initiate transaction controller
+	transactionController := transactionController.NewController(transactionService)
+
 	//create echo http
 	e := echo.New()
 
 	//register API path and handler
-	api.RegisterPath(e, authController, userController, petController, cartController)
+	api.RegisterPath(e, authController, userController, petController, cartController, transactionController)
 
 	// run server
 	go func() {

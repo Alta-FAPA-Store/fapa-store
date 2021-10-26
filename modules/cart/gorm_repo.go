@@ -145,3 +145,13 @@ func (repo *GormRepository) DeleteCartDetails(cartId int, productId int) error {
 
 	return nil
 }
+
+func (repo *GormRepository) UpdateQuantityCartDetails(cartId int, productId int, quantity int) error {
+	err := repo.DB.Model(&CartDetails{}).Where("cart_id = ?", cartId).Where("product_id = ?", productId).Update("quantity", quantity).Error
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

@@ -20,6 +20,12 @@ type FindCartSpec struct {
 	UserId int `validate:"required"`
 }
 
+type UpdateCartDetailsSpec struct {
+	CartId    int `validate:"required"`
+	ProductId int `validate:"required"`
+	Quantity  int `validate:"required"`
+}
+
 type service struct {
 	repository Repository
 }
@@ -82,7 +88,7 @@ func (s *service) InsertCart(insertCartSpec InsertCartSpec) error {
 			return err
 		}
 	} else {
-		cartDetails := newCartDetails(cartId, insertCartSpec.ProductId, 1, time.Now())
+		cartDetails := NewCartDetails(cartId, insertCartSpec.ProductId, 1, time.Now())
 
 		err = s.repository.InsertCartDetails(cartDetails)
 
@@ -96,6 +102,16 @@ func (s *service) InsertCart(insertCartSpec InsertCartSpec) error {
 
 func (s *service) DeleteCartDetails(deleteCartDetails DeleteCartDetailsSpec) error {
 	err := s.repository.DeleteCartDetails(deleteCartDetails.CartId, deleteCartDetails.ProductId)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *service) UpdateQuantityCartDetails(updateCartDetailSpec UpdateCartDetailsSpec) error {
+	err := s.repository.UpdateQuantityCartDetails(updateCartDetailSpec.CartId, updateCartDetailSpec.ProductId, updateCartDetailSpec.Quantity)
 
 	if err != nil {
 		return err
