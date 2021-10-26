@@ -15,6 +15,10 @@ import (
 	petService "go-hexagonal/business/pet"
 	petRepository "go-hexagonal/modules/pet"
 
+	productController "go-hexagonal/api/v1/product"
+	productService "go-hexagonal/business/product"
+	productRepository "go-hexagonal/modules/product"
+
 	authController "go-hexagonal/api/v1/auth"
 	authService "go-hexagonal/business/auth"
 
@@ -94,11 +98,20 @@ func main() {
 	//initiate auth controller
 	authController := authController.NewController(authService)
 
+	//initiate pet repository
+	productRepo := productRepository.NewGormDBRepository(dbConnection)
+
+	//initiate pet service
+	productService := productService.NewService(productRepo)
+
+	//initiate pet controller
+	productController := productController.NewController(productService)
+
 	//create echo http
 	e := echo.New()
 
 	//register API path and handler
-	api.RegisterPath(e, authController, userController, petController)
+	api.RegisterPath(e, authController, userController, petController, productController)
 
 	// run server
 	go func() {

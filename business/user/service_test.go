@@ -19,7 +19,7 @@ const (
 	last_name  = "last_name"
 	phoneNum   = "0818080"
 	email      = "email"
-	username   = "username"
+	username   = "fadellh"
 	password   = "password"
 	creator    = "creator"
 
