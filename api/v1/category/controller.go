@@ -1,11 +1,11 @@
-package product
+package category
 
 import (
 	"go-hexagonal/api/common"
 	"go-hexagonal/api/paginator"
-	"go-hexagonal/api/v1/product/request"
-	"go-hexagonal/api/v1/product/response"
-	"go-hexagonal/business/product"
+	"go-hexagonal/api/v1/category/request"
+	"go-hexagonal/api/v1/category/response"
+	"go-hexagonal/business/category"
 	"strconv"
 
 	"github.com/golang-jwt/jwt"
@@ -13,17 +13,17 @@ import (
 )
 
 type Controller struct {
-	service product.Service
+	service category.Service
 }
 
 //NewController Construct item API controller
-func NewController(service product.Service) *Controller {
+func NewController(service category.Service) *Controller {
 	return &Controller{
 		service,
 	}
 }
 
-func (controller *Controller) FindProductByID(c echo.Context) error {
+func (controller *Controller) FindCategoryByID(c echo.Context) error {
 	user := c.Get("user").(*jwt.Token)
 	if !user.Valid {
 		return c.JSON(common.NewForbiddenResponse())
@@ -31,17 +31,17 @@ func (controller *Controller) FindProductByID(c echo.Context) error {
 
 	id, _ := strconv.Atoi(c.Param("id"))
 
-	product, err := controller.service.FindProductByID(id)
+	category, err := controller.service.FindCategoryByID(id)
 	if err != nil {
 		return c.JSON(common.NewErrorBusinessResponse(err))
 	}
 
-	response := response.NewGetProductResponse(*product)
+	response := response.NewGetCategoryResponse(*category)
 
 	return c.JSON(common.NewSuccessResponse(response))
 }
 
-func (controller *Controller) FindAllProduct(c echo.Context) error {
+func (controller *Controller) FindAllCategory(c echo.Context) error {
 	user := c.Get("user").(*jwt.Token)
 	if !user.Valid {
 		return c.JSON(common.NewForbiddenResponse())
@@ -49,34 +49,32 @@ func (controller *Controller) FindAllProduct(c echo.Context) error {
 
 	pageQueryParam := c.QueryParam("page")
 	rowPerPageQueryParam := c.QueryParam("row_per_page")
-	nameQueryParam := c.QueryParam("name")
-	categoryQueryParam := c.QueryParam("category")
 
 	skip, page, rowPerPage := paginator.CreatePagination(pageQueryParam, rowPerPageQueryParam)
 
-	products, err := controller.service.FindAllProduct(skip, rowPerPage, categoryQueryParam, nameQueryParam)
+	categories, err := controller.service.FindAllCategory(skip, rowPerPage)
 	if err != nil {
 		return c.JSON(common.NewErrorBusinessResponse(err))
 	}
 
-	response := response.NewGetAllProductResponse(products, page, rowPerPage)
+	response := response.NewGetAllCategoryResponse(categories, page, rowPerPage)
 
 	return c.JSON(common.NewSuccessResponse(response))
 }
 
-func (controller *Controller) InsertProduct(c echo.Context) error {
+func (controller *Controller) InsertCategory(c echo.Context) error {
 
 	user := c.Get("user").(*jwt.Token)
 	if !user.Valid {
 		return c.JSON(common.NewForbiddenResponse())
 	}
 
-	insertProductRequest := new(request.InsertProductRequest)
-	if err := c.Bind(insertProductRequest); err != nil {
+	insertCategoryRequest := new(request.InsertCategoryRequest)
+	if err := c.Bind(insertCategoryRequest); err != nil {
 		return c.JSON(common.NewBadRequestResponse())
 	}
 
-	err := controller.service.InsertProduct(*insertProductRequest.ToUpsertProductSpec(), "creator")
+	err := controller.service.InsertCategory(*insertCategoryRequest.ToUpsertCategorySpec(), "creator")
 	if err != nil {
 		return c.JSON(common.NewErrorBusinessResponse(err))
 	}
@@ -84,7 +82,7 @@ func (controller *Controller) InsertProduct(c echo.Context) error {
 	return c.JSON(common.NewSuccessResponseWithoutData())
 }
 
-func (controller *Controller) UpdateProduct(c echo.Context) error {
+func (controller *Controller) UpdateCategory(c echo.Context) error {
 	user := c.Get("user").(*jwt.Token)
 	if !user.Valid {
 		return c.JSON(common.NewForbiddenResponse())
@@ -92,12 +90,12 @@ func (controller *Controller) UpdateProduct(c echo.Context) error {
 
 	id, _ := strconv.Atoi(c.Param("id"))
 
-	updateProductRequest := new(request.UpdateProductRequest)
-	if err := c.Bind(updateProductRequest); err != nil {
+	updateCategoryRequest := new(request.UpdateCategoryRequest)
+	if err := c.Bind(updateCategoryRequest); err != nil {
 		return c.JSON(common.NewBadRequestResponse())
 	}
 
-	err := controller.service.UpdateProduct(id, *updateProductRequest.ToUpsertProductSpec())
+	err := controller.service.UpdateCategory(id, *updateCategoryRequest.ToUpsertCategorySpec())
 	if err != nil {
 		return c.JSON(common.NewErrorBusinessResponse(err))
 	}
@@ -105,7 +103,7 @@ func (controller *Controller) UpdateProduct(c echo.Context) error {
 	return c.JSON(common.NewSuccessResponseWithoutData())
 }
 
-func (controller *Controller) DeleteProduct(c echo.Context) error {
+func (controller *Controller) DeleteCategory(c echo.Context) error {
 	user := c.Get("user").(*jwt.Token)
 	if !user.Valid {
 		return c.JSON(common.NewForbiddenResponse())
@@ -113,7 +111,7 @@ func (controller *Controller) DeleteProduct(c echo.Context) error {
 
 	id, _ := strconv.Atoi(c.Param("id"))
 
-	err := controller.service.DeleteProduct(id)
+	err := controller.service.DeleteCategory(id)
 
 	if err != nil {
 		return c.JSON(common.NewErrorBusinessResponse(err))

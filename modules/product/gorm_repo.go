@@ -86,6 +86,37 @@ func (repo *GormRepository) FindProductByID(id int) (*product.Product, error) {
 
 }
 
+func (repo *GormRepository) FindAllProduct(skip int, rowPerPage int, categoryParam, nameParam string) ([]product.Product, error) {
+
+	var products []ProductTable
+
+	var err error
+
+	err = repo.DB.Offset(skip).Limit(rowPerPage).Find(&products).Error
+
+	if categoryParam != "" {
+		err = repo.DB.Where("category_id = ?", categoryParam).Offset(skip).Limit(rowPerPage).Find(&products).Error
+	}
+	if nameParam != "" {
+		err = repo.DB.Where("name = ?", nameParam).Offset(skip).Limit(rowPerPage).Find(&products).Error
+	}
+
+	if nameParam != "" && categoryParam != "" {
+		err = repo.DB.Where("category_id = ?", categoryParam).Where("name = ?", nameParam).Offset(skip).Limit(rowPerPage).Find(&products).Error
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
+	var result []product.Product
+	for _, value := range products {
+		result = append(result, value.ToProduct())
+	}
+
+	return result, nil
+}
+
 func (repo *GormRepository) InsertProduct(product product.Product) error {
 
 	productData := newProductTable(product)
@@ -94,5 +125,37 @@ func (repo *GormRepository) InsertProduct(product product.Product) error {
 	if err != nil {
 		return err
 	}
+	return nil
+}
+
+func (repo *GormRepository) UpdateProduct(product product.Product) error {
+
+	productData := newProductTable(product)
+
+	err := repo.DB.Model(&productData).Where("id = ?", product.ID).Updates(
+		ProductTable{
+			Name:        product.Name,
+			Price:       product.Price,
+			Description: product.Description,
+			Stock:       product.Stock,
+			CategoryID:  product.CategoryID,
+			UpdatedAt:   product.UpdatedAt,
+		}).Error
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (repo *GormRepository) DeleteProduct(id int) error {
+	var product ProductTable
+	err := repo.DB.Where("id = ?", id).Delete(&product).Error
+
+	if err != nil {
+		return err
+	}
+
 	return nil
 }

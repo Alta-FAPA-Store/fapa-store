@@ -3,6 +3,7 @@ package api
 import (
 	"go-hexagonal/api/middleware"
 	"go-hexagonal/api/v1/auth"
+	"go-hexagonal/api/v1/category"
 	"go-hexagonal/api/v1/pet"
 	"go-hexagonal/api/v1/product"
 	"go-hexagonal/api/v1/user"
@@ -11,7 +12,7 @@ import (
 )
 
 //RegisterPath Register all API with routing path
-func RegisterPath(e *echo.Echo, authController *auth.Controller, userController *user.Controller, petController *pet.Controller, productController *product.Controller) {
+func RegisterPath(e *echo.Echo, authController *auth.Controller, userController *user.Controller, petController *pet.Controller, productController *product.Controller, categoryController *category.Controller) {
 	if authController == nil || userController == nil || petController == nil {
 		panic("Controller parameter cannot be nil")
 	}
@@ -39,10 +40,18 @@ func RegisterPath(e *echo.Echo, authController *auth.Controller, userController 
 	productV1 := e.Group("v1/products")
 	productV1.Use(middleware.JWTMiddleware())
 	productV1.GET("/:id", productController.FindProductByID)
-	// productV1.GET("", petController.FindAllPet)
+	productV1.GET("", productController.FindAllProduct)
 	productV1.POST("", productController.InsertProduct)
-	// productV1.PUT("/:id", petController.UpdatePet)
+	productV1.PUT("/:id", productController.UpdateProduct)
+	productV1.DELETE("/:id", productController.DeleteProduct)
 
+	categoryV1 := e.Group("v1/category")
+	categoryV1.Use(middleware.JWTMiddleware())
+	categoryV1.GET("/:id", categoryController.FindCategoryByID)
+	categoryV1.GET("", categoryController.FindAllCategory)
+	categoryV1.POST("", categoryController.InsertCategory)
+	categoryV1.PUT("/:id", categoryController.UpdateCategory)
+	categoryV1.DELETE("/:id", categoryController.DeleteCategory)
 	//health check
 	e.GET("/health", func(c echo.Context) error {
 		return c.NoContent(200)

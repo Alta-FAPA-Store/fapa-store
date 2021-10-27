@@ -12,7 +12,6 @@ type InsertProductRequest struct {
 	CategoryID  int    `json:"category_id"`
 }
 
-//ToUpsertPetSpec convert into Pet.UpsertPetSpec object
 func (req *InsertProductRequest) ToUpsertProductSpec() *product.InsertProductSpec {
 
 	var insertProductSpec product.InsertProductSpec

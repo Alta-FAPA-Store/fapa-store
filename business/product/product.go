@@ -15,17 +15,11 @@ type Product struct {
 	DeletedAt                          gorm.DeletedAt
 }
 
-type Category struct {
-	CategoryID   int
-	CategoryName string
-}
-
 type Photo struct {
 	URL interface{}
 }
 
 func NewProduct(
-	id int,
 	name string,
 	description string,
 	stock int,
@@ -35,7 +29,6 @@ func NewProduct(
 	createdAt time.Time) Product {
 
 	return Product{
-		ID:          id,
 		Price:       price,
 		Stock:       stock,
 		Version:     1,
