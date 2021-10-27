@@ -1,14 +1,18 @@
 package product
 
-import "time"
+import (
+	"time"
+
+	"gorm.io/gorm"
+)
 
 type Product struct {
-	ID, Price, Stock, Version                      int
-	Name, Description, Slug, CreatedBy, ModifiedBy string
-	Category                                       []Category
-	Photo                                          []Photo
-	CreatedAt                                      time.Time
-	ModifiedAt                                     time.Time
+	ID, Price, Stock, Version          int
+	Name, Description, Slug, CreatedBy string
+	CategoryID                         int
+	CreatedAt                          time.Time
+	UpdatedAt                          time.Time
+	DeletedAt                          gorm.DeletedAt
 }
 
 type Category struct {
@@ -26,6 +30,7 @@ func NewProduct(
 	description string,
 	stock int,
 	price int,
+	categoryId int,
 	creator string,
 	createdAt time.Time) Product {
 
@@ -37,11 +42,9 @@ func NewProduct(
 		Name:        name,
 		Description: description,
 		Slug:        "",
+		CategoryID:  categoryId,
 		CreatedBy:   creator,
-		ModifiedBy:  creator,
-		Category:    []Category{},
-		Photo:       []Photo{},
 		CreatedAt:   createdAt,
-		ModifiedAt:  createdAt,
+		UpdatedAt:   createdAt,
 	}
 }

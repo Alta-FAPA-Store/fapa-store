@@ -28,7 +28,7 @@ import (
 
 	echo "github.com/labstack/echo/v4"
 	"github.com/labstack/gommon/log"
-	"gorm.io/driver/postgres"
+	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
 
@@ -43,21 +43,21 @@ func newDatabaseConnection(config *config.AppConfig) *gorm.DB {
 	}
 
 	// connectionString := "host=localhost user=gorm password=gorm dbname=gorm port=9920 sslmode=disable TimeZone=Asia/Shanghai"
-	connectionString := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=Asia/Shanghai",
-		configDB["DB_Host"],
-		configDB["DB_Username"],
-		configDB["DB_Password"],
-		configDB["DB_Name"],
-		configDB["DB_Port"])
-
-	// connectionString := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8&parseTime=True&loc=Local",
+	// connectionString := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=Asia/Shanghai",
+	// 	configDB["DB_Host"],
 	// 	configDB["DB_Username"],
 	// 	configDB["DB_Password"],
-	// 	configDB["DB_Host"],
-	// 	configDB["DB_Port"],
-	// 	configDB["DB_Name"])
+	// 	configDB["DB_Name"],
+	// 	configDB["DB_Port"])
 
-	db, e := gorm.Open(postgres.Open(connectionString), &gorm.Config{})
+	connectionString := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8&parseTime=True&loc=Local",
+		configDB["DB_Username"],
+		configDB["DB_Password"],
+		configDB["DB_Host"],
+		configDB["DB_Port"],
+		configDB["DB_Name"])
+
+	db, e := gorm.Open(mysql.Open(connectionString), &gorm.Config{})
 	if e != nil {
 		panic(e)
 	}
@@ -115,7 +115,7 @@ func main() {
 
 	// run server
 	go func() {
-		address := fmt.Sprintf("localhost:%d", config.AppPort)
+		address := fmt.Sprintf("172.28.26.82:%d", config.AppPort)
 
 		if err := e.Start(address); err != nil {
 			log.Info("shutting down the server")

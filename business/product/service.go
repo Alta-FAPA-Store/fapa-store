@@ -12,7 +12,7 @@ type InsertProductSpec struct {
 	Description string `validate:"required"`
 	Stock       int    `validate:"required"`
 	Price       int    `validate:"required"`
-	Category    int
+	CategoryId  int    `validate:"required"`
 }
 type service struct {
 	repo Repository
@@ -24,8 +24,8 @@ func NewService(repository Repository) Service {
 	}
 }
 
-func (s *service) FindProductByID(id int, userID int) (*Product, error) {
-	return s.repo.FindProductByID(id, userID)
+func (s *service) FindProductByID(id int) (*Product, error) {
+	return s.repo.FindProductByID(id)
 }
 
 func (s *service) InsertProduct(insertProductSpec InsertProductSpec, createdBy string) error {
@@ -35,11 +35,12 @@ func (s *service) InsertProduct(insertProductSpec InsertProductSpec, createdBy s
 	}
 
 	product := NewProduct(
-		0,
+		insertProductSpec.ID,
 		insertProductSpec.Name,
 		insertProductSpec.Description,
 		insertProductSpec.Stock,
 		insertProductSpec.Price,
+		insertProductSpec.CategoryId,
 		createdBy,
 		time.Now(),
 	)

@@ -9,11 +9,11 @@ type InsertProductRequest struct {
 	Description string `json:"description"`
 	Stock       int    `json:"stock"`
 	Price       int    `json:"price"`
-	CategoryID  int    `json:"category"`
+	CategoryID  int    `json:"category_id"`
 }
 
 //ToUpsertPetSpec convert into Pet.UpsertPetSpec object
-func (req *InsertProductRequest) ToUpsertProductSpec(userID int) *product.InsertProductSpec {
+func (req *InsertProductRequest) ToUpsertProductSpec() *product.InsertProductSpec {
 
 	var insertProductSpec product.InsertProductSpec
 
@@ -21,7 +21,7 @@ func (req *InsertProductRequest) ToUpsertProductSpec(userID int) *product.Insert
 	insertProductSpec.Description = req.Description
 	insertProductSpec.Stock = req.Stock
 	insertProductSpec.Price = req.Price
-	insertProductSpec.Category = req.CategoryID
+	insertProductSpec.CategoryId = req.CategoryID
 
 	return &insertProductSpec
 }

@@ -10,59 +10,39 @@ import (
 type GormRepository struct {
 	DB *gorm.DB
 }
-
-// type ProductTable struct {
-// 	gorm.Model
-// 	Name                  string                  `gorm:"name"`
-// 	Price                 int                     `gorm:"price"`
-// 	Description           int                     `gorm:"description"`
-// 	Slug                  string                  `gorm:"slug"`
-// 	Stock                 string                  `gorm:"stock"`
-// 	ProductGalleriesTable []ProductGalleriesTable `gorm:"foreignKey:ProductTableID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL"`
-// 	ProductCategory       ProductCategoryTable    `gorm:"foreignKey:ProductID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL"`
-// 	ModifiedAt            time.Time               `gorm:"modified_at"`
-// 	ModifiedBy            string                  `gorm:"modified_by"`
-// 	Version               int                     `gorm:"version"`
-// }
 type ProductTable struct {
-	gorm.Model
-	Name        string `gorm:"name"`
-	Price       int    `gorm:"price"`
-	Description string `gorm:"description"`
-	Slug        string `gorm:"slug"`
-	Stock       int    `gorm:"stock"`
-	Version     int    `gorm:"version"`
-}
-
-type CategoryTable struct {
-	Name            string                 `gorm:"name"`
-	ModifiedAt      time.Time              `gorm:"modified_at"`
-	ModifiedBy      string                 `gorm:"modified_by"`
-	ProductCategory []ProductCategoryTable `gorm:"foreignKey:ID"`
-	gorm.Model
-	Version int `gorm:"version"`
-}
-
-type ProductCategoryTable struct {
-	CategoryID int `gorm:"category_id"`
-	ProductID  int `gorm:"product_id"`
-	gorm.Model
+	ID          int       `gorm:"id"`
+	Name        string    `gorm:"name"`
+	Price       int       `gorm:"price"`
+	Description string    `gorm:"description"`
+	Slug        string    `gorm:"slug"`
+	Stock       int       `gorm:"stock"`
+	CategoryID  int       `gorm:"category_id"`
+	CreatedAt   time.Time `gorm:"created_at"`
+	UpdatedAt   time.Time `gorm:"updated_at"`
+	DeletedAt   gorm.DeletedAt
 }
 
 type ProductGalleriesTable struct {
-	ProductTableID int       `gorm:"product_id"`
-	URL            string    `gorm:"url"`
-	IsFeatured     string    `gorm:"is_featured"`
-	ModifiedAt     time.Time `gorm:"modified_at"`
-	ModifiedBy     string    `gorm:"modified_by"`
-	gorm.Model
-	Version int `gorm:"version"`
+	Id         int       `gorm:"id"`
+	ProductID  int       `gorm:"product_id"`
+	URL        string    `gorm:"url"`
+	IsFeatured bool      `gorm:"is_featured"`
+	CreatedAt  time.Time `gorm:"created_at"`
+	UpdatedAt  time.Time `gorm:"updated_at"`
+	DeletedAt  gorm.DeletedAt
 }
 
 func (col *ProductTable) ToProduct() product.Product {
 	var product product.Product
 
+	product.ID = col.ID
 	product.Name = col.Name
+	product.Description = col.Description
+	product.Price = col.Price
+	product.Slug = col.Slug
+	product.Stock = col.Stock
+	product.CategoryID = col.CategoryID
 
 	return product
 }
@@ -70,17 +50,16 @@ func (col *ProductTable) ToProduct() product.Product {
 func newProductTable(product product.Product) *ProductTable {
 
 	return &ProductTable{
-		gorm.Model{
-			ID:        uint(product.ID),
-			CreatedAt: product.CreatedAt,
-			UpdatedAt: time.Now(),
-		},
+		product.ID,
 		product.Name,
 		product.Price,
 		product.Description,
 		product.Slug,
 		product.Stock,
-		product.Version,
+		product.CategoryID,
+		product.CreatedAt,
+		product.UpdatedAt,
+		product.DeletedAt,
 	}
 
 }
@@ -92,10 +71,10 @@ func NewGormDBRepository(db *gorm.DB) *GormRepository {
 	}
 }
 
-func (repo *GormRepository) FindProductByID(id, userID int) (*product.Product, error) {
+func (repo *GormRepository) FindProductByID(id int) (*product.Product, error) {
 	var productData ProductTable
 
-	err := repo.DB.Where("id = ?", id).Where("user_id = ?", userID).First(&productData).Error
+	err := repo.DB.Where("id = ?", id).First(&productData).Error
 
 	if err != nil {
 		return nil, err
@@ -110,7 +89,6 @@ func (repo *GormRepository) FindProductByID(id, userID int) (*product.Product, e
 func (repo *GormRepository) InsertProduct(product product.Product) error {
 
 	productData := newProductTable(product)
-	productData.ID = 0
 
 	err := repo.DB.Create(productData).Error
 	if err != nil {
