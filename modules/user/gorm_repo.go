@@ -58,6 +58,7 @@ func (col *UserTable) ToUser() user.User {
 	user.Lastname = col.Lastname
 	user.Phone = col.Phone
 	user.Username = col.Username
+	user.Password = col.Password
 	user.Email = col.Email
 	user.CreatedAt = col.CreatedAt
 	user.CreatedBy = col.CreatedBy

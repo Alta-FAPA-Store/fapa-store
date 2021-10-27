@@ -27,8 +27,8 @@ func NewUser(
 	last_name string,
 	phone string,
 	username string,
-	email string,
 	password string,
+	email string,
 	creator string,
 	createdAt time.Time) User {
 
