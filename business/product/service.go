@@ -14,6 +14,15 @@ type InsertProductSpec struct {
 	Price       int    `validate:"required"`
 	CategoryId  int    `validate:"required"`
 }
+
+type UpdateProductSpec struct {
+	Name        string `validate:"required"`
+	Description string `validate:"required"`
+	Stock       int    `validate:"number"`
+	Price       int    `validate:"number"`
+	CategoryId  int    `validate:"number"`
+}
+
 type service struct {
 	repo Repository
 }

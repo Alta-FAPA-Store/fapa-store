@@ -159,7 +159,7 @@ paths:
         description: "Product object that needs to be added to the store"
         required: true
         schema:
-          $ref: "#/definitions/Product"
+          $ref: "#/definitions/ProductById"
       responses:
         "405":
           description: "Invalid input"
@@ -281,19 +281,35 @@ definitions:
         type: "integer"
         format: "int64"
         example: 200000
-      photo_urls:
-        type: "string"
-        items:
-          type: "string"
-      status:
-        type: "string"
-        description: "product status in the store"
-        enum:
-        - "available"
-        - "pending"
-        - "sold"
     xml:
       name: "Product"
+  ProductById:
+    type: "object"
+    required:
+    - "name"
+    - "photo_urls"
+    - "price"
+    - "stock"
+    properties:
+      category_id:
+        type: "integer"
+        items: 
+         $ref: "#/definitions/Category"
+      name:
+        type: "string"
+        example: "Lenovo Legion"
+      description:
+        type: "string"
+        example: ""
+      stock:
+        type: "integer"
+        example: 5
+      price:
+        type: "integer"
+        format: "int64"
+        example: 200000
+    xml:
+      name: "ProductById"
   ApiResponse:
     type: "object"
     properties:
