@@ -33,3 +33,11 @@ func NewForbiddenResponse() (int, ControllerResponse) {
 		map[string]interface{}{},
 	}
 }
+
+func NewUngrantResponse() (int, ControllerResponse) {
+	return http.StatusForbidden, ControllerResponse{
+		ErrForbidden,
+		"Request Not Allowed",
+		map[string]interface{}{},
+	}
+}

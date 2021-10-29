@@ -21,6 +21,7 @@ const (
 	email      = "email"
 	username   = "fadellh"
 	password   = "password"
+	role       = "user"
 	creator    = "creator"
 
 	modifier = "modifier"
@@ -58,7 +59,7 @@ func TestFindUserByUsername(t *testing.T) {
 	})
 
 	t.Run("Expect user not found", func(t *testing.T) {
-		userRepository.On("FindUserByID", mock.AnythingOfType("string")).Return(nil, business.ErrNotFound).Once()
+		userRepository.On("FindUserByUsername", mock.AnythingOfType("string")).Return(nil, business.ErrNotFound).Once()
 
 		user, err := userService.FindUserByUsername(username)
 
@@ -123,6 +124,7 @@ func setup() {
 		phoneNum,
 		username,
 		password,
+		role,
 		email,
 		creator,
 		time.Now(),

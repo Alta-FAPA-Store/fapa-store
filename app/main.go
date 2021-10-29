@@ -11,10 +11,6 @@ import (
 	migration "go-hexagonal/modules/migration"
 	userRepository "go-hexagonal/modules/user"
 
-	petController "go-hexagonal/api/v1/pet"
-	petService "go-hexagonal/business/pet"
-	petRepository "go-hexagonal/modules/pet"
-
 	productController "go-hexagonal/api/v1/product"
 	productService "go-hexagonal/business/product"
 	productRepository "go-hexagonal/modules/product"
@@ -85,7 +81,6 @@ func main() {
 
 	//initialize database connection based on given config
 	dbConnection := newDatabaseConnection(config)
-
 	//initiate user repository
 	userRepo := userRepository.NewGormDBRepository(dbConnection)
 
@@ -96,20 +91,19 @@ func main() {
 	userController := userController.NewController(userService)
 
 	//initiate pet repository
-	petRepo := petRepository.NewGormDBRepository(dbConnection)
+	// petRepo := petRepository.NewGormDBRepository(dbConnection)
 
-	//initiate pet service
-	petService := petService.NewService(petRepo)
+	// //initiate pet service
+	// petService := petService.NewService(petRepo)
 
-	//initiate pet controller
-	petController := petController.NewController(petService)
+	// //initiate pet controller
+	// petController := petController.NewController(petService)
 
 	//initiate auth service
 	authService := authService.NewService(userService)
 
 	//initiate auth controller
 	authController := authController.NewController(authService)
-
 
 	productRepo := productRepository.NewGormDBRepository(dbConnection)
 	productService := productService.NewService(productRepo)
@@ -142,14 +136,13 @@ func main() {
 
 	//register API path and handler
 
-	api.RegisterPath(e, authController, userController, petController, cartController, transactionController, productController, categoryController)
-
+	api.RegisterPath(e, authController, userController, cartController, transactionController, productController, categoryController)
 
 	// run server
 	go func() {
-		address := fmt.Sprintf("172.28.26.82:%d", config.AppPort)
-
+		address := fmt.Sprintf("localhost:%d", config.AppPort)
 		if err := e.Start(address); err != nil {
+			fmt.Println(err)
 			log.Info("shutting down the server")
 		}
 	}()

@@ -71,6 +71,18 @@ func (controller *Controller) InsertProduct(c echo.Context) error {
 		return c.JSON(common.NewForbiddenResponse())
 	}
 
+	claims := user.Claims.(jwt.MapClaims)
+
+	userRole, ok := claims["role"]
+
+	if !ok {
+		return c.JSON(common.NewForbiddenResponse())
+	}
+
+	if userRole != "admin" {
+		return c.JSON(common.NewUngrantResponse())
+	}
+
 	insertProductRequest := new(request.InsertProductRequest)
 	if err := c.Bind(insertProductRequest); err != nil {
 		return c.JSON(common.NewBadRequestResponse())

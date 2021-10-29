@@ -28,6 +28,7 @@ func NewUser(
 	phone string,
 	username string,
 	password string,
+	role string,
 	email string,
 	creator string,
 	createdAt time.Time) User {
@@ -38,6 +39,7 @@ func NewUser(
 		Lastname:   last_name,
 		Username:   username,
 		Password:   password,
+		Role:       role,
 		Phone:      phone,
 		Email:      email,
 		CreatedAt:  createdAt,
