@@ -1,9 +1,7 @@
 package migration
 
 import (
-
 	"go-hexagonal/modules/category"
-	"go-hexagonal/modules/pet"
 	"go-hexagonal/modules/product"
 
 	"go-hexagonal/modules/cart"

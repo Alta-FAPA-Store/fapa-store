@@ -69,6 +69,18 @@ func (controller *Controller) InsertCategory(c echo.Context) error {
 		return c.JSON(common.NewForbiddenResponse())
 	}
 
+	claims := user.Claims.(jwt.MapClaims)
+
+	userRole, ok := claims["role"]
+
+	if !ok {
+		return c.JSON(common.NewForbiddenResponse())
+	}
+
+	if userRole != "admin" {
+		return c.JSON(common.NewUngrantResponse())
+	}
+
 	insertCategoryRequest := new(request.InsertCategoryRequest)
 	if err := c.Bind(insertCategoryRequest); err != nil {
 		return c.JSON(common.NewBadRequestResponse())

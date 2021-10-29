@@ -5,11 +5,9 @@ import (
 	"go-hexagonal/api/v1/auth"
 
 	"go-hexagonal/api/v1/category"
-	"go-hexagonal/api/v1/pet"
 	"go-hexagonal/api/v1/product"
 
 	"go-hexagonal/api/v1/cart"
-	"go-hexagonal/api/v1/pet"
 	"go-hexagonal/api/v1/transaction"
 
 	"go-hexagonal/api/v1/user"
@@ -19,12 +17,11 @@ import (
 
 //RegisterPath Register all API with routing path
 
-func RegisterPath(e *echo.Echo, authController *auth.Controller, userController *user.Controller, petController *pet.Controller, cartController *cart.Controller, transactionController *transaction.Controller,productController *product.Controller, categoryController *category.Controller) {
-	if authController == nil || userController == nil || petController == nil || cartController == nil || transactionController == nil || productController == nil || categoryController == nil{
+func RegisterPath(e *echo.Echo, authController *auth.Controller, userController *user.Controller, cartController *cart.Controller, transactionController *transaction.Controller, productController *product.Controller, categoryController *category.Controller) {
+	if authController == nil || userController == nil || cartController == nil || transactionController == nil || productController == nil || categoryController == nil {
 
 		panic("Controller parameter cannot be nil")
 	}
-
 	//authentication with Versioning endpoint
 	authV1 := e.Group("v1/auth")
 	authV1.POST("/login", authController.Login)
@@ -38,12 +35,11 @@ func RegisterPath(e *echo.Echo, authController *auth.Controller, userController 
 	userV1.PUT("/:username", userController.UpdateUser)
 
 	//pet with Versioning endpoint
-	petV1 := e.Group("v1/pets")
-	petV1.GET("/:id", petController.FindPetByID)
-	petV1.GET("", petController.FindAllPet)
-	petV1.POST("", petController.InsertPet)
-	petV1.PUT("/:id", petController.UpdatePet)
-
+	// petV1 := e.Group("v1/pets")
+	// petV1.GET("/:id", petController.FindPetByID)
+	// petV1.GET("", petController.FindAllPet)
+	// petV1.POST("", petController.InsertPet)
+	// petV1.PUT("/:id", petController.UpdatePet)
 
 	//product with versioning endpoint
 	productV1 := e.Group("v1/products")

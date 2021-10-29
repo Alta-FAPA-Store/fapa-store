@@ -32,6 +32,7 @@ func (s *service) Login(username string, password string) (string, error) {
 	claims["id"] = user.ID
 	claims["exp"] = time.Now().Add(time.Hour * 1).Unix() //Token expires after 1 hour
 	claims["name"] = user.Firstname
+	claims["role"] = user.Role
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 

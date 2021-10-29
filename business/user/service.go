@@ -71,6 +71,7 @@ func (s *service) InsertUser(insertUserSpec InsertUserSpec, createdBy string) er
 		insertUserSpec.Phone,
 		insertUserSpec.Username,
 		insertUserSpec.Password,
+		"user",
 		insertUserSpec.Email,
 		createdBy,
 		time.Now(),
