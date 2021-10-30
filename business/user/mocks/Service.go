@@ -59,6 +59,28 @@ func (_m *Service) FindUserByID(id int) (*user.User, error) {
 	return r0, r1
 }
 
+func (_m *Service) FindUserByUsername(username string) (*user.User, error) {
+	ret := _m.Called(username)
+
+	var r0 *user.User
+	if rf, ok := ret.Get(0).(func(string) *user.User); ok {
+		r0 = rf(username)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*user.User)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(username)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // FindUserByUsernameAndPassword provides a mock function with given fields: username, password
 func (_m *Service) FindUserByUsernameAndPassword(username string, password string) (*user.User, error) {
 	ret := _m.Called(username, password)
@@ -94,6 +116,7 @@ func (_m *Service) InsertUser(insertUserSpec user.InsertUserSpec, createdBy stri
 	}
 
 	return r0
+
 }
 
 // UpdateUser provides a mock function with given fields: id, name, modifiedBy, currentVersion

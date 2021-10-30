@@ -17,12 +17,12 @@ type Repository struct {
 func (_m *Repository) FindAllUser(skip int, rowPerPage int) ([]user.User, error) {
 	ret := _m.Called(skip, rowPerPage)
 
-	var r0 []user.User
-	if rf, ok := ret.Get(0).(func(int, int) []user.User); ok {
+	var r0 *[]user.User
+	if rf, ok := ret.Get(0).(func(int, int) *[]user.User); ok {
 		r0 = rf(skip, rowPerPage)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]user.User)
+			r0 = ret.Get(0).(*[]user.User)
 		}
 	}
 
@@ -33,7 +33,7 @@ func (_m *Repository) FindAllUser(skip int, rowPerPage int) ([]user.User, error)
 		r1 = ret.Error(1)
 	}
 
-	return r0, r1
+	return *r0, r1
 }
 
 // FindUserByID provides a mock function with given fields: id
@@ -60,8 +60,25 @@ func (_m *Repository) FindUserByID(id int) (*user.User, error) {
 }
 
 func (_m *Repository) FindUserByUsername(username string) (*user.User, error) {
+	ret := _m.Called(username)
 
-	return &user.User{}, nil
+	var r0 *user.User
+	if rf, ok := ret.Get(0).(func(string) *user.User); ok {
+		r0 = rf(username)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*user.User)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(username)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
 }
 
 // FindUserByUsernameAndPassword provides a mock function with given fields: username, password

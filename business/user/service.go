@@ -41,9 +41,11 @@ func (s *service) FindUserByUsername(username string) (*User, error) {
 	user, err := s.repository.FindUserByUsername(username)
 
 	if err != nil {
-		return &User{}, business.ErrNotFound
+		return nil, business.ErrNotFound
 	}
 	return user, err
+
+	// return s.repository.FindUserByUsername(username)
 }
 
 //FindUserByUsernameAndPassword Get user by given ID, return nil if not exist
@@ -52,7 +54,7 @@ func (s *service) FindUserByUsernameAndPassword(username string, password string
 	user, err := s.repository.FindUserByUsernameAndPassword(username, password)
 
 	if err != nil {
-		return &User{}, business.ErrNotFound
+		return nil, business.ErrNotFound
 	}
 
 	return user, err
@@ -63,7 +65,7 @@ func (s *service) FindAllUser(skip int, rowPerPage int) ([]User, error) {
 
 	user, err := s.repository.FindAllUser(skip, rowPerPage)
 	if err != nil {
-		return []User{}, err
+		return nil, err
 	}
 
 	return user, err
@@ -112,5 +114,9 @@ func (s *service) UpdateUser(username string, update UpdateUserRequest, modified
 
 	modifiedUser := user.ModifyUser(update, time.Now(), modifiedBy)
 
-	return s.repository.UpdateUser(modifiedUser, currentVersion)
+	err = s.repository.UpdateUser(modifiedUser, currentVersion)
+	if err != nil {
+		return err
+	}
+	return nil
 }
