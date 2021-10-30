@@ -14,4 +14,6 @@ var (
 
 	//ErrInvalidSpec Error when data given is not valid on update or insert
 	ErrInvalidSpec = errors.New("Given spec is not valid")
+
+	ErrInvalidUsername = errors.New("Username was created")
 )

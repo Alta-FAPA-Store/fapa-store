@@ -13,7 +13,7 @@ type InsertUserSpec struct {
 	Email     string `validate:"required"`
 	Username  string `validate:"required"`
 	Password  string `validate:"required"`
-	Phone     string `validate:"required"`
+	Phone     string
 }
 
 type UpdateUserRequest struct {
@@ -38,12 +38,24 @@ func NewService(repositoryParam Repository) Service {
 }
 
 func (s *service) FindUserByUsername(username string) (*User, error) {
-	return s.repository.FindUserByUsername(username)
+	user, err := s.repository.FindUserByUsername(username)
+
+	if err != nil {
+		return &User{}, business.ErrNotFound
+	}
+	return user, err
 }
 
 //FindUserByUsernameAndPassword Get user by given ID, return nil if not exist
 func (s *service) FindUserByUsernameAndPassword(username string, password string) (*User, error) {
-	return s.repository.FindUserByUsernameAndPassword(username, password)
+	// var user User
+	user, err := s.repository.FindUserByUsernameAndPassword(username, password)
+
+	if err != nil {
+		return &User{}, business.ErrNotFound
+	}
+
+	return user, err
 }
 
 //FindAllUser Get all users , will be return empty array if no data or error occured
