@@ -33,14 +33,21 @@ func NewService(repository Repository) Service {
 }
 
 func (s *service) FindProductByID(id int) (*Product, error) {
-	return s.repo.FindProductByID(id)
+
+	product, err := s.repo.FindProductByID(id)
+
+	if err != nil {
+		return nil, business.ErrNotFound
+	}
+
+	return product, nil
 }
 
 func (s *service) FindAllProduct(skip int, rowPerPage int, categoryParam, nameParam string) ([]Product, error) {
 
 	product, err := s.repo.FindAllProduct(skip, rowPerPage, categoryParam, nameParam)
 	if err != nil {
-		return []Product{}, err
+		return nil, err
 	}
 
 	return product, err
