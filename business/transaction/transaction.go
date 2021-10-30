@@ -22,6 +22,15 @@ type Transaction struct {
 	DeletedAt     gorm.DeletedAt
 }
 
+type MidtransCustomerDetails struct {
+	FirstName    string
+	LastName     string
+	Email        string
+	Phone        string
+	Address      string
+	TotalPayment int
+}
+
 func NewTransaction(userId int, cartId int, courier string, paymentMethod string, paymentUrl sql.NullString, totalPrice float32, status string, createdAt time.Time) Transaction {
 	return Transaction{
 		UserId:        userId,

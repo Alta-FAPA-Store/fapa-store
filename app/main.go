@@ -36,21 +36,24 @@ import (
 
 	echo "github.com/labstack/echo/v4"
 	"github.com/labstack/gommon/log"
-	"gorm.io/driver/mysql"
+
+	// "gorm.io/driver/mysql"
+
+	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
 func newDatabaseConnection(config *config.AppConfig) *gorm.DB {
 
-	configDB := map[string]string{
-		"DB_Username": os.Getenv("GOHEXAGONAL_DB_USERNAME"),
-		"DB_Password": os.Getenv("GOHEXAGONAL_DB_PASSWORD"),
-		"DB_Port":     os.Getenv("GOHEXAGONAL_DB_PORT"),
-		"DB_Host":     os.Getenv("GOHEXAGONAL_DB_ADDRESS"),
-		"DB_Name":     os.Getenv("GOHEXAGONAL_DB_NAME"),
-	}
+	// configDB := map[string]string{
+	// 	"DB_Username": os.Getenv("GOHEXAGONAL_DB_USERNAME"),
+	// 	"DB_Password": os.Getenv("GOHEXAGONAL_DB_PASSWORD"),
+	// 	"DB_Port":     os.Getenv("GOHEXAGONAL_DB_PORT"),
+	// 	"DB_Host":     os.Getenv("GOHEXAGONAL_DB_ADDRESS"),
+	// 	"DB_Name":     os.Getenv("GOHEXAGONAL_DB_NAME"),
+	// }
 
-	// connectionString := "host=localhost user=gorm password=gorm dbname=gorm port=9920 sslmode=disable TimeZone=Asia/Shanghai"
+	connectionString := "host=localhost user=postgres password=root dbname=fapa-store port=5432 sslmode=disable TimeZone=Asia/Shanghai"
 	// connectionString := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=Asia/Shanghai",
 	// 	configDB["DB_Host"],
 	// 	configDB["DB_Username"],
@@ -58,14 +61,14 @@ func newDatabaseConnection(config *config.AppConfig) *gorm.DB {
 	// 	configDB["DB_Name"],
 	// 	configDB["DB_Port"])
 
-	connectionString := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8&parseTime=True&loc=Local",
-		configDB["DB_Username"],
-		configDB["DB_Password"],
-		configDB["DB_Host"],
-		configDB["DB_Port"],
-		configDB["DB_Name"])
+	// connectionString := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8&parseTime=True&loc=Local",
+	// 	configDB["DB_Username"],
+	// 	configDB["DB_Password"],
+	// 	configDB["DB_Host"],
+	// 	configDB["DB_Port"],
+	// 	configDB["DB_Name"])
 
-	db, e := gorm.Open(mysql.Open(connectionString), &gorm.Config{})
+	db, e := gorm.Open(postgres.Open(connectionString), &gorm.Config{})
 	if e != nil {
 		panic(e)
 	}
