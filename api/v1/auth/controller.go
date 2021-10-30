@@ -38,3 +38,20 @@ func (controller *Controller) Login(c echo.Context) error {
 
 	return c.JSON(common.NewSuccessResponse(response))
 }
+
+func (controller *Controller) Register(c echo.Context) error {
+	registerRequest := new(request.RegisterRequest)
+
+	if err := c.Bind(registerRequest); err != nil {
+		return c.JSON(common.NewBadRequestResponse())
+	}
+
+	validationId, err := controller.service.Register(registerRequest.Username, registerRequest.Email, registerRequest.Password, registerRequest.Firstname, registerRequest.Lastname)
+	if err != nil {
+		return c.JSON(common.NewErrorBusinessResponse(err))
+	}
+
+	response := response.NewRegisterResponse(validationId)
+
+	return c.JSON(common.NewSuccessResponse(response))
+}

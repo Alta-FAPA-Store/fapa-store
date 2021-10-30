@@ -25,6 +25,7 @@ func RegisterPath(e *echo.Echo, authController *auth.Controller, userController 
 	//authentication with Versioning endpoint
 	authV1 := e.Group("v1/auth")
 	authV1.POST("/login", authController.Login)
+	authV1.POST("/register", authController.Register)
 
 	//user with Versioning endpoint
 	userV1 := e.Group("v1/users")
