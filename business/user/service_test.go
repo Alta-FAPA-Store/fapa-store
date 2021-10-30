@@ -15,17 +15,16 @@ import (
 
 const (
 	id         = 1
-	first_name = "first_name"
-	last_name  = "last_name"
+	first_name = "Fadel"
+	last_name  = "Lukman"
 	phoneNum   = "0818080"
 	email      = "email"
 	username   = "fadellh"
-	password   = "password"
+	password   = "123"
 	role       = "user"
 	creator    = "creator"
-
-	modifier = "modifier"
-	version  = 1
+	modifier   = "modifier"
+	version    = 1
 )
 
 var (
@@ -94,7 +93,7 @@ func TestInsertUserByID(t *testing.T) {
 
 func TestUpdateUserByID(t *testing.T) {
 	t.Run("Expect update user success", func(t *testing.T) {
-		userRepository.On("FindUserByID", mock.AnythingOfType("string")).Return(&userData, nil).Once()
+		userRepository.On("FindUserByUsername", mock.AnythingOfType("string")).Return(&userData, nil).Once()
 		userRepository.On("UpdateUser", mock.AnythingOfType("user.User"), mock.AnythingOfType("int")).Return(nil).Once()
 
 		err := userService.UpdateUser(username, user.UpdateUserRequest{}, modifier, version)

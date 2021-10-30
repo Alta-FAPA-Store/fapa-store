@@ -50,6 +50,8 @@ func newDatabaseConnection(config *config.AppConfig) *gorm.DB {
 		"DB_Name":     os.Getenv("GOHEXAGONAL_DB_NAME"),
 	}
 
+	fmt.Println(configDB["DB_Host"])
+
 	// connectionString := "host=localhost user=gorm password=gorm dbname=gorm port=9920 sslmode=disable TimeZone=Asia/Shanghai"
 	// connectionString := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=Asia/Shanghai",
 	// 	configDB["DB_Host"],
@@ -64,6 +66,8 @@ func newDatabaseConnection(config *config.AppConfig) *gorm.DB {
 		configDB["DB_Host"],
 		configDB["DB_Port"],
 		configDB["DB_Name"])
+
+	// connectionString := "admin:mysql0bisa0@tcp(fapa.cqy7cdg9ftqw.us-east-2.rds.amazonaws.com:3306)/fapa?charset=utf8&parseTime=True&loc=Local"
 
 	db, e := gorm.Open(mysql.Open(connectionString), &gorm.Config{})
 	if e != nil {
@@ -140,8 +144,10 @@ func main() {
 
 	// run server
 	go func() {
+		// address := fmt.Sprintf("localhost:%d", config.AppPort)
 		address := fmt.Sprintf("localhost:%d", config.AppPort)
-		if err := e.Start(address); err != nil {
+		fmt.Println(address)
+		if err := e.Start("localhost:8000"); err != nil {
 			fmt.Println(err)
 			log.Info("shutting down the server")
 		}
