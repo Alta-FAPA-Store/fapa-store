@@ -3,7 +3,7 @@ name: ci/cd process
 on:
   push:
     branches: 
-      - 'main'
+      - 'test-deploy-fadel'
 
 jobs:
   unit-test:
