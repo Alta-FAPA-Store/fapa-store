@@ -5,7 +5,6 @@ import (
 	"go-hexagonal/business/transaction"
 	"time"
 
-	"github.com/midtrans/midtrans-go"
 	"gorm.io/gorm"
 )
 
@@ -29,18 +28,28 @@ type Transaction struct {
 }
 
 type MidtransCustomerDetails struct {
-	Firstname    string
-	Lastname     string
-	Email        string
-	Phone        string
-	Address      string
-	TotalPayment int
+	Firstname string
+	Lastname  string
+	Email     string
+	Phone     string
+	Address   string
 }
 
 type MidtransItemDetails struct {
 	Name     string
 	Price    int
 	Quantity int
+}
+
+type MidtransCreatePayment struct {
+	Firstname     string
+	Lastname      string
+	Email         string
+	Phone         string
+	Address       string
+	TransactionId int
+	TotalPayment  int
+	Items         []MidtransItemDetails
 }
 
 //NewGormDBRepository Generate Gorm DB transaction repository
@@ -86,17 +95,25 @@ func (col *Transaction) ToTransactionDetails() transaction.Transaction {
 	return transactionDetails
 }
 
-func (col *MidtransCustomerDetails) ToMidtransCustomerDetails(totalPrice int) transaction.MidtransCustomerDetails {
-	var customerRequest transaction.MidtransCustomerDetails
+func (col *MidtransCreatePayment) ToMidtransCreatePaymentRequest(transcationId int, totalPrice int, customerDetails MidtransCustomerDetails) transaction.MidtransCreatePaymentRequest {
+	var midtransCreatePaymentRequest transaction.MidtransCreatePaymentRequest
 
-	customerRequest.FirstName = col.Firstname
-	customerRequest.LastName = col.Lastname
-	customerRequest.Email = col.Email
-	customerRequest.Phone = col.Phone
-	customerRequest.Address = col.Address
-	customerRequest.TotalPayment = totalPrice
+	midtransCreatePaymentRequest.Firstname = customerDetails.Firstname
+	midtransCreatePaymentRequest.Lastname = customerDetails.Lastname
+	midtransCreatePaymentRequest.Email = customerDetails.Email
+	midtransCreatePaymentRequest.Phone = customerDetails.Phone
+	midtransCreatePaymentRequest.Address = customerDetails.Address
+	midtransCreatePaymentRequest.TransactionId = transcationId
+	midtransCreatePaymentRequest.TotalPayment = totalPrice
 
-	return customerRequest
+	var itemDetails []transaction.MidtransItemDetails
+	for _, value := range col.Items {
+		itemDetails = append(itemDetails, transaction.MidtransItemDetails{Name: value.Name, Price: value.Price, Quantity: value.Quantity})
+	}
+
+	midtransCreatePaymentRequest.Items = itemDetails
+
+	return midtransCreatePaymentRequest
 }
 
 func (repo *GormRepository) CreateTransaction(transaction transaction.Transaction) (int, error) {
@@ -117,28 +134,29 @@ func (repo *GormRepository) CreateTransaction(transaction transaction.Transactio
 	return transactionData.Id, nil
 }
 
-func (repo *GormRepository) GetMidtransCustomerDetails(createTransactionSpec transaction.CreateTransactionSpec) (transaction.MidtransCustomerDetails, []midtrans.ItemDetails, error) {
-	var customerRequest MidtransCustomerDetails
+func (repo *GormRepository) GetMidtransPaymentRequest(transactionId int, createTransactionSpec transaction.CreateTransactionSpec) (transaction.MidtransCreatePaymentRequest, error) {
+	var midtransCreatePaymentRequest MidtransCreatePayment
+	var customerDetails MidtransCustomerDetails
 	var itemDetails []MidtransItemDetails
 
-	err := repo.DB.Table("user_tables").Select("firstname, lastname, email, phone, address").Where("id = ?", createTransactionSpec.UserId).Find(&customerRequest).Error
+	err := repo.DB.Table("user_tables").Select("firstname, lastname, email, phone, address").Where("id = ?", createTransactionSpec.UserId).Find(&customerDetails).Error
 
 	if err != nil {
-		return transaction.MidtransCustomerDetails{}, nil, err
+		return transaction.MidtransCreatePaymentRequest{}, err
 	}
 
 	repo.DB.Table("cart_details").Select("product_tables.name, product_tables.price, cart_details.quantity").Joins("JOIN product_tables ON cart_details.product_id = product_tables.id").Where("cart_id = ?", createTransactionSpec.CartId).Scan(&itemDetails)
 
-	var dataItem []midtrans.ItemDetails
 	var totalPrice int = 0
 	for _, value := range itemDetails {
 		totalPrice += value.Price * value.Quantity
-		dataItem = append(dataItem, midtrans.ItemDetails{Name: value.Name, Price: int64(value.Price), Qty: int32(value.Quantity)})
 	}
 
-	dataCustomer := customerRequest.ToMidtransCustomerDetails(totalPrice)
+	midtransCreatePaymentRequest.Items = itemDetails
 
-	return dataCustomer, dataItem, nil
+	midtransRequest := midtransCreatePaymentRequest.ToMidtransCreatePaymentRequest(transactionId, totalPrice, customerDetails)
+
+	return midtransRequest, nil
 }
 
 func (repo *GormRepository) GetAllTransaction(userId int, limit int, offset int) ([]transaction.Transaction, error) {

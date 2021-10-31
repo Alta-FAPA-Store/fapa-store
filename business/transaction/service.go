@@ -1,15 +1,13 @@
 package transaction
 
 import (
+	"bytes"
 	"database/sql"
-	"errors"
+	"encoding/json"
 	"go-hexagonal/business"
 	"go-hexagonal/util/validator"
-	"strconv"
+	"net/http"
 	"time"
-
-	"github.com/midtrans/midtrans-go"
-	"github.com/midtrans/midtrans-go/snap"
 )
 
 type CreateTransactionSpec struct {
@@ -37,61 +35,11 @@ func NewService(repository Repository) Service {
 	}
 }
 
-var s snap.Client
-
-func initializeSnapClient() {
-	s.New("SB-Mid-server-0qpp_T4NqLWf8ifdV4kJoKhl", midtrans.Sandbox)
-}
-
-func createTransaction(orderId string, customerDetails MidtransCustomerDetails, itemDetails []midtrans.ItemDetails) (string, error) {
-	// Send request to Midtrans Snap API
-	resp, err := s.CreateTransaction(GenerateSnapReq(orderId, customerDetails, itemDetails))
-	if err != nil {
-		return "", errors.New(err.GetMessage())
-	}
-
-	return resp.RedirectURL, nil
-}
-
-func GenerateSnapReq(orderId string, customerDetails MidtransCustomerDetails, itemDetails []midtrans.ItemDetails) *snap.Request {
-
-	// Initiate Customer address
-	custAddress := &midtrans.CustomerAddress{
-		FName:   customerDetails.FirstName,
-		LName:   customerDetails.LastName,
-		Phone:   customerDetails.Phone,
-		Address: customerDetails.Address,
-	}
-
-	// Initiate Snap Request
-	snapReq := &snap.Request{
-		TransactionDetails: midtrans.TransactionDetails{
-			OrderID:  orderId,
-			GrossAmt: int64(customerDetails.TotalPayment),
-		},
-		CreditCard: &snap.CreditCardDetails{
-			Secure: true,
-		},
-		CustomerDetail: &midtrans.CustomerDetails{
-			FName:    customerDetails.FirstName,
-			LName:    customerDetails.LastName,
-			Email:    customerDetails.Email,
-			Phone:    customerDetails.Phone,
-			BillAddr: custAddress,
-			ShipAddr: custAddress,
-		},
-		EnabledPayments: snap.AllSnapPaymentType,
-		Items:           &itemDetails,
-	}
-
-	return snapReq
-}
-
-func (s *service) CreateTransaction(createTransactionSpec CreateTransactionSpec) error {
+func (s *service) CreateTransaction(createTransactionSpec CreateTransactionSpec) (string, error) {
 	err := validator.GetValidator().Struct(createTransactionSpec)
 
 	if err != nil {
-		return business.ErrInvalidSpec
+		return "", business.ErrInvalidSpec
 	}
 
 	transactionData := NewTransaction(
@@ -108,31 +56,49 @@ func (s *service) CreateTransaction(createTransactionSpec CreateTransactionSpec)
 	transactionId, err := s.repository.CreateTransaction(transactionData)
 
 	if err != nil {
-		return err
+		return "", err
 	}
 
+	var redirectUrl string
 	if createTransactionSpec.PaymentMethod == "midtrans" {
-		customerDetails, itemDetails, err := s.repository.GetMidtransCustomerDetails(createTransactionSpec)
+		midtransCreatePaymentRequest, err := s.repository.GetMidtransPaymentRequest(transactionId, createTransactionSpec)
 
 		if err != nil {
-			return err
+			return "", err
 		}
 
-		initializeSnapClient()
-		paymentUrl, err := createTransaction(strconv.Itoa(transactionId), customerDetails, itemDetails)
+		postBody, _ := json.Marshal(map[string]interface{}{
+			"first_name":     midtransCreatePaymentRequest.Firstname,
+			"last_name":      midtransCreatePaymentRequest.Lastname,
+			"email":          midtransCreatePaymentRequest.Email,
+			"phone":          midtransCreatePaymentRequest.Phone,
+			"address":        midtransCreatePaymentRequest.Address,
+			"transaction_id": midtransCreatePaymentRequest.TransactionId,
+			"total_price":    midtransCreatePaymentRequest.TotalPayment,
+			"items":          midtransCreatePaymentRequest.Items,
+		})
+
+		requestBody := bytes.NewReader(postBody)
+
+		res, err := http.Post("http://127.0.0.1:8000/v1/payment", "application/json", requestBody)
 
 		if err != nil {
-			return err
+			return "", err
 		}
 
-		err = s.repository.UpdatePaymentUrlTransaction(transactionId, paymentUrl)
+		var responseData map[string]interface{}
+		err = json.NewDecoder(res.Body).Decode(&responseData)
 
 		if err != nil {
-			return err
+			return "", nil
 		}
+
+		res.Body.Close()
+
+		redirectUrl = responseData["data"].(string)
 	}
 
-	return nil
+	return redirectUrl, nil
 }
 
 func (s *service) GetAllTransaction(userId int, limit int, offset int) ([]Transaction, error) {
