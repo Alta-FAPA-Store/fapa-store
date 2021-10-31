@@ -51,7 +51,6 @@ func newDatabaseConnection(config *config.AppConfig) *gorm.DB {
 		"DB_Name":     os.Getenv("GOHEXAGONAL_DB_NAME"),
 	}
 
-<<<<<<< HEAD
 	fmt.Println(configDB["DB_Host"])
 
 	// connectionString := "host=localhost user=gorm password=gorm dbname=gorm port=9920 sslmode=disable TimeZone=Asia/Shanghai"
@@ -62,8 +61,6 @@ func newDatabaseConnection(config *config.AppConfig) *gorm.DB {
 	// 	configDB["DB_Name"],
 	// 	configDB["DB_Port"])
 
-=======
->>>>>>> 3645535c752fae920f6e6e6e5d6c8cc035618564
 	connectionString := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8&parseTime=True&loc=Local",
 		configDB["DB_Username"],
 		configDB["DB_Password"],

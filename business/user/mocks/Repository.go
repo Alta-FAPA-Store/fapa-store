@@ -71,20 +71,6 @@ func (_m *Repository) FindUserByUsername(username string) (*user.User, error) {
 		}
 	}
 
-<<<<<<< HEAD
-	ret := _m.Called(username)
-
-	var r0 *user.User
-	if rf, ok := ret.Get(0).(func(string) *user.User); ok {
-		r0 = rf(username)
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*user.User)
-		}
-	}
-
-=======
->>>>>>> 3645535c752fae920f6e6e6e5d6c8cc035618564
 	var r1 error
 	if rf, ok := ret.Get(1).(func(string) error); ok {
 		r1 = rf(username)
