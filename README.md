@@ -1,4 +1,4 @@
-# Sample Golang API Server
+# MVP Ecommerce Project with Golang API Server
 
 Sample REST API build using echo server.
 
@@ -19,9 +19,9 @@ To describe about how port and adapter interaction (separation concerned), this 
 Just execute code below in your console
 
 ```console
-./run.sh
+go run app/main.go
 ```
 
 # How To Consume The API
 
-To make it easier please download [Insomnia Core](https://insomnia.rest) app and import [this collection](https://raw.githubusercontent.com/favians/go-hexagonal/master/api/insomnia.json).
+
