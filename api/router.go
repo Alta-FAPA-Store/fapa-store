@@ -25,6 +25,7 @@ func RegisterPath(e *echo.Echo, authController *auth.Controller, userController 
 	//authentication with Versioning endpoint
 	authV1 := e.Group("v1/auth")
 	authV1.POST("/login", authController.Login)
+	authV1.POST("/register", authController.Register)
 
 	//user with Versioning endpoint
 	userV1 := e.Group("v1/users")
@@ -33,13 +34,6 @@ func RegisterPath(e *echo.Echo, authController *auth.Controller, userController 
 	userV1.GET("/:username", userController.FindUserByUsername)
 	userV1.GET("", userController.FindAllUser)
 	userV1.PUT("/:username", userController.UpdateUser)
-
-	//pet with Versioning endpoint
-	// petV1 := e.Group("v1/pets")
-	// petV1.GET("/:id", petController.FindPetByID)
-	// petV1.GET("", petController.FindAllPet)
-	// petV1.POST("", petController.InsertPet)
-	// petV1.PUT("/:id", petController.UpdatePet)
 
 	//product with versioning endpoint
 	productV1 := e.Group("v1/products")

@@ -5,8 +5,12 @@
 *.so
 *.dylib
 /config/.env
+<<<<<<< HEAD
 .env
 
+=======
+/.vscode
+>>>>>>> 3645535c752fae920f6e6e6e5d6c8cc035618564
 # Test binary, built with `go test -c`
 *.test
 

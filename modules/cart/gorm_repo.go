@@ -53,7 +53,7 @@ func newCartDetails(cartDetails cart.CartDetails) *CartDetails {
 	}
 }
 
-func (col *Cart) ToCart() cart.Cart {
+func (col *Cart) ToCart(cartDetails []cart.CartDetailsWithProduct) cart.Cart {
 	var cart cart.Cart
 
 	cart.Id = col.Id
@@ -61,6 +61,7 @@ func (col *Cart) ToCart() cart.Cart {
 	cart.IsCheckout = col.IsCheckout
 	cart.CreatedAt = col.CreatedAt
 	cart.UpdatedAt = col.UpdatedAt
+	cart.Details = cartDetails
 
 	return cart
 }
@@ -106,7 +107,10 @@ func (repo *GormRepository) FindCartByUserId(userId int) (*cart.Cart, error) {
 		return nil, nil
 	}
 
-	cart := cartData.ToCart()
+	var results []cart.CartDetailsWithProduct
+	repo.DB.Table("cart_details").Select("cart_details.id, product_tables.name, product_tables.price, cart_details.quantity").Joins("JOIN product_tables ON cart_details.product_id = product_tables.id").Where("cart_details.cart_id = ?", cartData.Id).Where("cart_details.deleted_at IS NULL").Scan(&results)
+
+	cart := cartData.ToCart(results)
 
 	return &cart, nil
 }

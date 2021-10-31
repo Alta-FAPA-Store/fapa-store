@@ -116,6 +116,7 @@ func (_m *Service) InsertUser(insertUserSpec user.InsertUserSpec, createdBy stri
 	}
 
 	return r0
+
 }
 
 // UpdateUser provides a mock function with given fields: id, name, modifiedBy, currentVersion

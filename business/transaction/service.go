@@ -1,9 +1,12 @@
 package transaction
 
 import (
+	"bytes"
 	"database/sql"
+	"encoding/json"
 	"go-hexagonal/business"
 	"go-hexagonal/util/validator"
+	"net/http"
 	"time"
 )
 
@@ -16,6 +19,12 @@ type CreateTransactionSpec struct {
 	Status        string  `validate:"required"`
 }
 
+type ListItem struct {
+	Price int
+	Qty   int
+	Name  string
+}
+
 type service struct {
 	repository Repository
 }
@@ -26,11 +35,11 @@ func NewService(repository Repository) Service {
 	}
 }
 
-func (s *service) CreateTransaction(createTransactionSpec CreateTransactionSpec) error {
+func (s *service) CreateTransaction(createTransactionSpec CreateTransactionSpec) (string, error) {
 	err := validator.GetValidator().Struct(createTransactionSpec)
 
 	if err != nil {
-		return business.ErrInvalidSpec
+		return "", business.ErrInvalidSpec
 	}
 
 	transactionData := NewTransaction(
@@ -44,13 +53,52 @@ func (s *service) CreateTransaction(createTransactionSpec CreateTransactionSpec)
 		time.Now(),
 	)
 
-	err = s.repository.CreateTransaction(transactionData)
+	transactionId, err := s.repository.CreateTransaction(transactionData)
 
 	if err != nil {
-		return err
+		return "", err
 	}
 
-	return nil
+	var redirectUrl string
+	if createTransactionSpec.PaymentMethod == "midtrans" {
+		midtransCreatePaymentRequest, err := s.repository.GetMidtransPaymentRequest(transactionId, createTransactionSpec)
+
+		if err != nil {
+			return "", err
+		}
+
+		postBody, _ := json.Marshal(map[string]interface{}{
+			"first_name":     midtransCreatePaymentRequest.Firstname,
+			"last_name":      midtransCreatePaymentRequest.Lastname,
+			"email":          midtransCreatePaymentRequest.Email,
+			"phone":          midtransCreatePaymentRequest.Phone,
+			"address":        midtransCreatePaymentRequest.Address,
+			"transaction_id": midtransCreatePaymentRequest.TransactionId,
+			"total_price":    midtransCreatePaymentRequest.TotalPayment,
+			"items":          midtransCreatePaymentRequest.Items,
+		})
+
+		requestBody := bytes.NewReader(postBody)
+
+		res, err := http.Post("http://127.0.0.1:8000/v1/payment", "application/json", requestBody)
+
+		if err != nil {
+			return "", err
+		}
+
+		var responseData map[string]interface{}
+		err = json.NewDecoder(res.Body).Decode(&responseData)
+
+		if err != nil {
+			return "", nil
+		}
+
+		res.Body.Close()
+
+		redirectUrl = responseData["data"].(string)
+	}
+
+	return redirectUrl, nil
 }
 
 func (s *service) GetAllTransaction(userId int, limit int, offset int) ([]Transaction, error) {

@@ -2,7 +2,6 @@ package transaction
 
 import (
 	"database/sql"
-	"go-hexagonal/business/cart"
 	"go-hexagonal/business/transaction"
 	"time"
 
@@ -26,6 +25,31 @@ type Transaction struct {
 	UpdatedAt     time.Time      `gorm:"updated_at"`
 	UpdatedBy     sql.NullString `gorm:"updated_by"`
 	DeletedAt     gorm.DeletedAt
+}
+
+type MidtransCustomerDetails struct {
+	Firstname string
+	Lastname  string
+	Email     string
+	Phone     string
+	Address   string
+}
+
+type MidtransItemDetails struct {
+	Name     string
+	Price    int
+	Quantity int
+}
+
+type MidtransCreatePayment struct {
+	Firstname     string
+	Lastname      string
+	Email         string
+	Phone         string
+	Address       string
+	TransactionId int
+	TotalPayment  int
+	Items         []MidtransItemDetails
 }
 
 //NewGormDBRepository Generate Gorm DB transaction repository
@@ -71,22 +95,68 @@ func (col *Transaction) ToTransactionDetails() transaction.Transaction {
 	return transactionDetails
 }
 
-func (repo *GormRepository) CreateTransaction(transaction transaction.Transaction) error {
+func (col *MidtransCreatePayment) ToMidtransCreatePaymentRequest(transcationId int, totalPrice int, customerDetails MidtransCustomerDetails) transaction.MidtransCreatePaymentRequest {
+	var midtransCreatePaymentRequest transaction.MidtransCreatePaymentRequest
+
+	midtransCreatePaymentRequest.Firstname = customerDetails.Firstname
+	midtransCreatePaymentRequest.Lastname = customerDetails.Lastname
+	midtransCreatePaymentRequest.Email = customerDetails.Email
+	midtransCreatePaymentRequest.Phone = customerDetails.Phone
+	midtransCreatePaymentRequest.Address = customerDetails.Address
+	midtransCreatePaymentRequest.TransactionId = transcationId
+	midtransCreatePaymentRequest.TotalPayment = totalPrice
+
+	var itemDetails []transaction.MidtransItemDetails
+	for _, value := range col.Items {
+		itemDetails = append(itemDetails, transaction.MidtransItemDetails{Name: value.Name, Price: value.Price, Quantity: value.Quantity})
+	}
+
+	midtransCreatePaymentRequest.Items = itemDetails
+
+	return midtransCreatePaymentRequest
+}
+
+func (repo *GormRepository) CreateTransaction(transaction transaction.Transaction) (int, error) {
 	transactionData := NewTransactionData(transaction)
 
 	err := repo.DB.Create(transactionData).Error
 
 	if err != nil {
-		return err
+		return 0, err
 	}
 
-	err = repo.DB.Model(&cart.Cart{}).Where("id = ?", transactionData.CartId).Update("is_checkout", true).Error
+	err = repo.DB.Table("carts").Where("id = ?", transactionData.CartId).Update("is_checkout", true).Error
 
 	if err != nil {
-		return err
+		return 0, err
 	}
 
-	return nil
+	return transactionData.Id, nil
+}
+
+func (repo *GormRepository) GetMidtransPaymentRequest(transactionId int, createTransactionSpec transaction.CreateTransactionSpec) (transaction.MidtransCreatePaymentRequest, error) {
+	var midtransCreatePaymentRequest MidtransCreatePayment
+	var customerDetails MidtransCustomerDetails
+	var itemDetails []MidtransItemDetails
+
+	err := repo.DB.Table("user_tables").Select("firstname, lastname, email, phone, address").Where("id = ?", createTransactionSpec.UserId).Find(&customerDetails).Error
+
+	if err != nil {
+		return transaction.MidtransCreatePaymentRequest{}, err
+	}
+
+	repo.DB.Table("cart_details").Select("product_tables.name, product_tables.price, cart_details.quantity").Joins("JOIN product_tables ON cart_details.product_id = product_tables.id").Where("cart_id = ?", createTransactionSpec.CartId).Scan(&itemDetails)
+
+	var totalPrice int = 0
+	for _, value := range itemDetails {
+		totalPrice += value.Price * value.Quantity
+	}
+
+	midtransCreatePaymentRequest.Items = itemDetails
+
+	midtransRequest := midtransCreatePaymentRequest.ToMidtransCreatePaymentRequest(transactionId, totalPrice, customerDetails)
+
+	return midtransRequest, nil
 }
 
 func (repo *GormRepository) GetAllTransaction(userId int, limit int, offset int) ([]transaction.Transaction, error) {
@@ -139,6 +209,15 @@ func (repo *GormRepository) UpdateTransaction(transactionId int, status string) 
 	return nil
 }
 
+func (repo *GormRepository) UpdatePaymentUrlTransaction(transactionId int, paymentUrl string) error {
+	err := repo.DB.Model(&Transaction{}).Where("id = ?", transactionId).Update("payment_url", paymentUrl).Error
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
 func (repo *GormRepository) DeleteTransaction(transactionId int) error {
 	err := repo.DB.Where("id = ?", transactionId).Delete(&Transaction{}).Error
 

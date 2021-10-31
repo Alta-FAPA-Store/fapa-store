@@ -3,7 +3,7 @@ package transaction
 type Service interface {
 	GetAllTransaction(userId int, limit int, offset int) ([]Transaction, error)
 	GetTransactionDetails(transactionId int) (*Transaction, error)
-	CreateTransaction(createTransactionSpec CreateTransactionSpec) error
+	CreateTransaction(createTransactionSpec CreateTransactionSpec) (string, error)
 	UpdateTransaction(transactionId int, status string) error
 	DeleteTransaction(transactionId int) error
 }
@@ -11,7 +11,9 @@ type Service interface {
 type Repository interface {
 	GetAllTransaction(userId int, limit int, offset int) ([]Transaction, error)
 	GetTransactionDetails(transactionId int) (*Transaction, error)
-	CreateTransaction(transaction Transaction) error
+	CreateTransaction(transaction Transaction) (int, error)
 	UpdateTransaction(transactionId int, status string) error
+	UpdatePaymentUrlTransaction(transactionId int, paymentUrl string) error
 	DeleteTransaction(transactionId int) error
+	GetMidtransPaymentRequest(transactionId int, createTransactionSpec CreateTransactionSpec) (MidtransCreatePaymentRequest, error)
 }
