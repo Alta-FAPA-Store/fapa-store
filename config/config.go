@@ -3,6 +3,7 @@ package config
 import (
 	"sync"
 
+	"github.com/joho/godotenv"
 	"github.com/labstack/gommon/log"
 	"github.com/spf13/viper"
 )
@@ -30,6 +31,8 @@ var appConfig *AppConfig
 
 //GetConfig Initiatilize config in singleton way
 func GetConfig() *AppConfig {
+	godotenv.Load("./config/.env")
+
 	if appConfig != nil {
 		return appConfig
 	}
