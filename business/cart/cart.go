@@ -13,6 +13,7 @@ type Cart struct {
 	CreatedAt  time.Time
 	UpdatedAt  time.Time
 	DeletedAt  gorm.DeletedAt
+	Details    []CartDetailsWithProduct
 }
 
 type CartDetails struct {
@@ -23,6 +24,13 @@ type CartDetails struct {
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	DeletedAt gorm.DeletedAt
+}
+
+type CartDetailsWithProduct struct {
+	Id       int    `json:"cart_details_id"`
+	Name     string `json:"product_name"`
+	Price    int    `json:"product_price"`
+	Quantity int    `json:"quantity"`
 }
 
 func NewCart(userId int, isCheckout bool, createdAt time.Time) Cart {

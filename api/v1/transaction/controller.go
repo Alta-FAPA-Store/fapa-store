@@ -29,13 +29,13 @@ func (controller *Controller) CreateTransaction(c echo.Context) error {
 		return c.JSON(common.NewBadRequestResponse())
 	}
 
-	err := controller.service.CreateTransaction(*createTransactionRequest.ToUpSertTransactionSpec())
+	urlRedirect, err := controller.service.CreateTransaction(*createTransactionRequest.ToUpSertTransactionSpec())
 
 	if err != nil {
 		return c.JSON(common.NewErrorBusinessResponse(err))
 	}
 
-	return c.JSON(common.NewSuccessResponseWithoutData())
+	return c.JSON(common.NewSuccessResponse(urlRedirect))
 }
 
 func (controller *Controller) GetAllTransaction(c echo.Context) error {
