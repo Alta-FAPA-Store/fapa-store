@@ -90,15 +90,6 @@ func main() {
 	//initiate user controller
 	userController := userController.NewController(userService)
 
-	//initiate pet repository
-	// petRepo := petRepository.NewGormDBRepository(dbConnection)
-
-	// //initiate pet service
-	// petService := petService.NewService(petRepo)
-
-	// //initiate pet controller
-	// petController := petController.NewController(petService)
-
 	//initiate auth service
 	authService := authService.NewService(userService)
 

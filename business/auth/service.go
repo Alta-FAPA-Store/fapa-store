@@ -68,6 +68,5 @@ func (s *service) Register(username, email, password, firstname, lastname string
 	}
 
 	//call notification service
-
 	return "id verifikasi", err
 }

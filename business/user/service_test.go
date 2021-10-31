@@ -90,9 +90,9 @@ func TestFindAllUser(t *testing.T) {
 	})
 
 	t.Run("Expect user not found", func(t *testing.T) {
-		userRepository.On("FindUserByUsernameAndPassword", mock.AnythingOfType("string"), mock.AnythingOfType("string")).Return(nil, business.ErrNotFound).Once()
+		userRepository.On("FindAllUser", mock.AnythingOfType("int"), mock.AnythingOfType("int")).Return(nil, business.ErrNotFound).Once()
 
-		user, err := userService.FindUserByUsernameAndPassword(username, password)
+		user, err := userService.FindAllUser(1, 10)
 
 		assert.NotNil(t, err)
 
