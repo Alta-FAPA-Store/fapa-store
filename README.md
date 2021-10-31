@@ -23,6 +23,7 @@ go run app/main.go
 ```
 
 # ERD Design
-![golang ERD Design](https://github.com/Alta-FAPA-Store/fapa-store/raw/master/ERD Online Shop.jpeg.png)
+![golang ERD Design](https://github.com/Alta-FAPA-Store/fapa-store/blob/main/ERD%20Online%20Shop.jpeg)
+![alt text]https://github.com/Alta-FAPA-Store/fapa-store/blob/main/ERD%20Online%20Shop.jpeg
 
 
