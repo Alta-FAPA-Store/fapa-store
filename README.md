@@ -25,5 +25,6 @@ go run app/main.go
 # ERD Design
 ![golang ERD Design](https://github.com/Alta-FAPA-Store/fapa-store/blob/main/ERD%20Online%20Shop.jpeg)
 
-
+## Sytem Design
+![golang Sytem Design](https://github.com/Alta-FAPA-Store/fapa-store/blob/main/System%20design%20diagram.jpeg)
 
