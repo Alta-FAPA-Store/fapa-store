@@ -25,7 +25,13 @@ func NewService(repository Repository) Service {
 }
 
 func (s *service) FindCategoryByID(id int) (*Category, error) {
-	return s.repo.FindCategoryByID(id)
+	category, err := s.repo.FindCategoryByID(id)
+
+	if err != nil {
+		return nil, business.ErrNotFound
+	}
+
+	return category, nil
 }
 
 func (s *service) FindAllCategory(skip int, rowPerPage int) ([]Category, error) {
