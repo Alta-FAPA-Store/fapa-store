@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"go-hexagonal/business"
 	"go-hexagonal/business/user"
 	"os"
 	"time"
@@ -11,6 +12,18 @@ import (
 //=============== The implementation of those interface put below =======================
 type service struct {
 	userService user.Service
+}
+
+func NewUser(username, email, password, firstname, lastname string) user.InsertUserSpec {
+
+	return user.InsertUserSpec{
+		Firstname: firstname,
+		Lastname:  lastname,
+		Username:  username,
+		Email:     email,
+		Password:  password,
+		Phone:     "",
+	}
 }
 
 //NewService Construct user service object
@@ -37,4 +50,23 @@ func (s *service) Login(username string, password string) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
 	return token.SignedString([]byte(os.Getenv("JWT_SECRET")))
+}
+
+func (s *service) Register(username, email, password, firstname, lastname string) (string, error) {
+	user, err := s.userService.FindUserByUsername(username)
+
+	if user == nil {
+		return "", business.ErrInvalidUsername
+	}
+
+	userNew := NewUser(username, email, password, firstname, lastname)
+
+	err = s.userService.InsertUser(userNew, "system")
+
+	if err != nil {
+		return "", err
+	}
+
+	//call notification service
+	return "id verifikasi", err
 }
