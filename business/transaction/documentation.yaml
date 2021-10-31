@@ -1,0 +1,162 @@
+openapi: "3.0.0"
+info:
+  title: "Fapa-Store RESTful API"
+  description: "This is a list endpoint of Transaction Service"
+  version: "1.0.0"
+  contact:
+    name: Developer
+    email: "raygakertia1@gmail.com"
+  license:
+    name: "Apache 2.0"
+    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+servers:
+  - url: "https://staging.fapastore.com/api/v1"
+  - url: "https://fapasotre.com/api/v1"
+paths:
+  /transaction:
+    get:
+      summary: "Get list of all transaction"
+      description: "This is a endpoint for get list of transaction. Used for 'admin' for get all transaction or for 'user' for get their history transaction"
+      parameters:
+        - name: "user_id"
+          description: "Get all transaction for specific user."
+          required: false
+          in: "query"
+          schema:
+            type: "string"
+        - name: "limit"
+          description: "For pagination, default limit is '10'"
+          required: false
+          in: "query"
+          schema:
+            type: "number"
+        - name: "page"
+          description: "For pagination, start from '1'"
+          required: false
+          in: "query"
+          schema:
+            type: "number"
+      responses:
+        200:
+          description: "Get list transaction success"
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  type: "object"
+                  properties:
+                    transaction_id:
+                      type: string
+                    total_price:
+                      type: number
+                      format: float
+                    courier:
+                      type: "string"
+                    status:
+                      type: string
+        
+    post:
+      summary: "Create transaction"
+      description: "Create new transaction from users"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: "object"
+              properties:
+                courier:
+                  type: "string"
+                  required: true
+                payment_method:
+                  type: "string"
+                  required: true
+                total_price:
+                  type: "number"
+                  format: "float"
+                  required: true
+                status:
+                  type: "string"
+                  default: "PENDING"
+                  required: true
+      responses:
+        201:
+          description: "Create transaction success"
+        
+  /transaction/{transactionId}:
+    get:
+      summary: "Get details of transaction"
+      description: "Get details of transcation"
+      parameters:
+        - name: "transactionId"
+          description: "Transaction ID"
+          required: true
+          in: "path"
+          schema:
+            type: "string"
+      responses:
+        200:
+          description: "Get details transaction success"
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  type: "object"
+                  properties:
+                    transaction_id:
+                      type: string
+                    total_price:
+                      type: number
+                      format: float
+                    courier:
+                      type: "string"
+                    status:
+                      type: string
+        
+    put:
+      summary: "Update transaction user"
+      description: "Update transaction, only 'status' can be updated by admin"
+      parameters:
+        - name: "transactionId"
+          description: "Transaction ID"
+          required: true
+          in: "path"
+          schema:
+            type: "string"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: "object"
+              properties:
+                status:
+                  type: "string"
+                  required: true
+      responses:
+        200:
+          description: "Update transaction success"
+    
+    delete:
+      summary: "Delete transaction"
+      description: "Soft delete transaction, can be used only for 'admin'"
+      parameters:
+        - name: "transactionId"
+          description: "Transaction ID"
+          required: true
+          in: "path"
+          schema:
+            type: "string"
+      responses:
+        200:
+          description: "Delete transaction success"
+
+  /transaction/notification:
+    post:
+      summary: "Handle notification from third party 'MIDTRANS'"
+      description: "Handle transaction notification response from MIDTRANS after user pay using midtrans"
+      responses:
+        200:
+          description: "Handle notification success"
