@@ -140,7 +140,7 @@ func (s *service) Register(username, email, password, firstname, lastname string
 		return "", err
 	}
 
-	PubliserEmail(email)
+	// PubliserEmail(email)
 
 	//call notification service
 	return "", err
