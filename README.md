@@ -22,6 +22,7 @@ Just execute code below in your console
 go run app/main.go
 ```
 
-# How To Consume The API
+# ERD Design
+![golang ERD Design](https://github.com/Alta-FAPA-Store/fapa-store/raw/master/ERD Online Shop.jpeg.png)
 
 
