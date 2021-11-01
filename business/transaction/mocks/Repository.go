@@ -81,7 +81,7 @@ func (_m *Repository) UpdateTransaction(transactionId int, status string) error 
 	return nil
 }
 
-func (_m *Repository) UpdatePaymentUrlTransaction(transactionId int, paymentUrl string) error {
+func (_m *Repository) UpdatePaymentUrlWithStatusTransaction(transactionId int, paymentUrl string, status string) error {
 	return nil
 }
 

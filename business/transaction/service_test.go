@@ -109,7 +109,6 @@ func setup() {
 		Courier:       courier,
 		PaymentMethod: payment_method,
 		TotalPrice:    total_price,
-		Status:        status,
 	}
 
 	// midtransItemDetails = transaction.MidtransItemDetails{
