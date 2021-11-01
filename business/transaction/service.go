@@ -16,7 +16,6 @@ type CreateTransactionSpec struct {
 	Courier       string  `validate:"required"`
 	PaymentMethod string  `validate:"required"`
 	TotalPrice    float32 `validate:"required"`
-	Status        string  `validate:"required"`
 }
 
 type ListItem struct {
@@ -43,13 +42,14 @@ func (s *service) CreateTransaction(createTransactionSpec CreateTransactionSpec)
 	}
 
 	transactionData := NewTransaction(
+		1,
 		createTransactionSpec.UserId,
 		createTransactionSpec.CartId,
 		createTransactionSpec.Courier,
 		createTransactionSpec.PaymentMethod,
 		sql.NullString{},
 		createTransactionSpec.TotalPrice,
-		createTransactionSpec.Status,
+		"CREATED",
 		time.Now(),
 	)
 
@@ -90,12 +90,18 @@ func (s *service) CreateTransaction(createTransactionSpec CreateTransactionSpec)
 		err = json.NewDecoder(res.Body).Decode(&responseData)
 
 		if err != nil {
-			return "", nil
+			return "", err
 		}
 
-		res.Body.Close()
+		defer res.Body.Close()
 
 		redirectUrl = responseData["data"].(string)
+	}
+
+	err = s.repository.UpdatePaymentUrlWithStatusTransaction(transactionId, redirectUrl, "PENDING")
+
+	if err != nil {
+		return "", err
 	}
 
 	return redirectUrl, nil

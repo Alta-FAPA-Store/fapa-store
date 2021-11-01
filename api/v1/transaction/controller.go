@@ -7,6 +7,7 @@ import (
 	"go-hexagonal/api/v1/transaction/response"
 	"go-hexagonal/business/transaction"
 
+	"github.com/golang-jwt/jwt"
 	"github.com/labstack/echo/v4"
 
 	"strconv"
@@ -23,6 +24,11 @@ func NewController(service transaction.Service) *Controller {
 }
 
 func (controller *Controller) CreateTransaction(c echo.Context) error {
+	user := c.Get("user").(*jwt.Token)
+	if !user.Valid {
+		return c.JSON(common.NewForbiddenResponse())
+	}
+
 	createTransactionRequest := new(request.CreateTransactionRequest)
 
 	if err := c.Bind(createTransactionRequest); err != nil {
@@ -39,13 +45,18 @@ func (controller *Controller) CreateTransaction(c echo.Context) error {
 }
 
 func (controller *Controller) GetAllTransaction(c echo.Context) error {
+	user := c.Get("user").(*jwt.Token)
+	if !user.Valid {
+		return c.JSON(common.NewForbiddenResponse())
+	}
+
 	userId, _ := strconv.Atoi(c.QueryParam("user_id"))
 	limit := c.QueryParam("limit")
-	offset := c.QueryParam("offset")
+	offset := c.QueryParam("page")
 
-	_, page, rowPerPage := paginator.CreatePagination(offset, limit)
+	skip, page, rowPerPage := paginator.CreatePagination(offset, limit)
 
-	transactions, err := controller.service.GetAllTransaction(userId, rowPerPage, page-1)
+	transactions, err := controller.service.GetAllTransaction(userId, rowPerPage-1, skip)
 
 	if err != nil {
 		return c.JSON(common.NewErrorBusinessResponse(err))
@@ -57,6 +68,11 @@ func (controller *Controller) GetAllTransaction(c echo.Context) error {
 }
 
 func (controller *Controller) GetTransactionDetails(c echo.Context) error {
+	user := c.Get("user").(*jwt.Token)
+	if !user.Valid {
+		return c.JSON(common.NewForbiddenResponse())
+	}
+
 	transactionId, _ := strconv.Atoi(c.Param("transaction_id"))
 
 	transactionDetails, err := controller.service.GetTransactionDetails(transactionId)
@@ -71,6 +87,11 @@ func (controller *Controller) GetTransactionDetails(c echo.Context) error {
 }
 
 func (controller *Controller) UpdateTransaction(c echo.Context) error {
+	user := c.Get("user").(*jwt.Token)
+	if !user.Valid {
+		return c.JSON(common.NewForbiddenResponse())
+	}
+
 	transactionId, _ := strconv.Atoi(c.Param("transaction_id"))
 
 	updateTransactionRequest := new(request.UpdateTransactionRequest)
@@ -89,6 +110,11 @@ func (controller *Controller) UpdateTransaction(c echo.Context) error {
 }
 
 func (controller *Controller) DeleteTransaction(c echo.Context) error {
+	user := c.Get("user").(*jwt.Token)
+	if !user.Valid {
+		return c.JSON(common.NewForbiddenResponse())
+	}
+
 	transactionId, _ := strconv.Atoi(c.Param("transaction_id"))
 
 	err := controller.service.DeleteTransaction(transactionId)
