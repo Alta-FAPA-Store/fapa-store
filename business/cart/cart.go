@@ -33,8 +33,9 @@ type CartDetailsWithProduct struct {
 	Quantity int    `json:"quantity"`
 }
 
-func NewCart(userId int, isCheckout bool, createdAt time.Time) Cart {
+func NewCart(id int, userId int, isCheckout bool, createdAt time.Time) Cart {
 	return Cart{
+		Id:         id,
 		UserId:     userId,
 		IsCheckout: isCheckout,
 		CreatedAt:  createdAt,

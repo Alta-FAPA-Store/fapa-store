@@ -16,4 +16,6 @@ var (
 	ErrInvalidSpec = errors.New("Given spec is not valid")
 
 	ErrInvalidUsername = errors.New("Username was created")
+
+	ErrUserNotFound = errors.New("User not found")
 )

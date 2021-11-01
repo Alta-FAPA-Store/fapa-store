@@ -2,6 +2,7 @@ package transaction
 
 import (
 	"database/sql"
+	"go-hexagonal/business"
 	"go-hexagonal/business/transaction"
 	"time"
 
@@ -50,6 +51,10 @@ type MidtransCreatePayment struct {
 	TransactionId int
 	TotalPayment  int
 	Items         []MidtransItemDetails
+}
+
+type User struct {
+	Id int
 }
 
 //NewGormDBRepository Generate Gorm DB transaction repository
@@ -118,6 +123,7 @@ func (col *MidtransCreatePayment) ToMidtransCreatePaymentRequest(transcationId i
 
 func (repo *GormRepository) CreateTransaction(transaction transaction.Transaction) (int, error) {
 	transactionData := NewTransactionData(transaction)
+	transactionData.Id = 0
 
 	err := repo.DB.Create(transactionData).Error
 
@@ -161,8 +167,16 @@ func (repo *GormRepository) GetMidtransPaymentRequest(transactionId int, createT
 
 func (repo *GormRepository) GetAllTransaction(userId int, limit int, offset int) ([]transaction.Transaction, error) {
 	var transactions []Transaction
+	var user User
 
 	if userId != 0 {
+
+		findUser := repo.DB.Table("user_tables").Select("id").Where("id = ?", userId).Scan(&user)
+
+		if findUser.RowsAffected == 0 {
+			return nil, business.ErrUserNotFound
+		}
+
 		err := repo.DB.Limit(limit).Offset(offset).Where("user_id = ?", userId).Find(&transactions).Error
 
 		if err != nil {
@@ -209,8 +223,8 @@ func (repo *GormRepository) UpdateTransaction(transactionId int, status string) 
 	return nil
 }
 
-func (repo *GormRepository) UpdatePaymentUrlTransaction(transactionId int, paymentUrl string) error {
-	err := repo.DB.Model(&Transaction{}).Where("id = ?", transactionId).Update("payment_url", paymentUrl).Error
+func (repo *GormRepository) UpdatePaymentUrlWithStatusTransaction(transactionId int, paymentUrl string, status string) error {
+	err := repo.DB.Model(&Transaction{}).Where("id = ?", transactionId).Updates(map[string]interface{}{"payment_url": paymentUrl, "status": status}).Error
 
 	if err != nil {
 		return err
@@ -218,6 +232,7 @@ func (repo *GormRepository) UpdatePaymentUrlTransaction(transactionId int, payme
 
 	return nil
 }
+
 func (repo *GormRepository) DeleteTransaction(transactionId int) error {
 	err := repo.DB.Where("id = ?", transactionId).Delete(&Transaction{}).Error
 

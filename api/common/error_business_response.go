@@ -37,6 +37,8 @@ func errorMapping(err error) (int, BusinessResponse) {
 		return newValidationResponse(err.Error())
 	case business.ErrHasBeenModified:
 		return newHasBeedModifiedResponse()
+	case business.ErrUserNotFound:
+		return newUserNotFoundResponse()
 	}
 }
 
@@ -72,6 +74,14 @@ func newValidationResponse(message string) (int, BusinessResponse) {
 	return http.StatusBadRequest, BusinessResponse{
 		errInvalidSpec,
 		"Validation failed " + message,
+		map[string]interface{}{},
+	}
+}
+
+func newUserNotFoundResponse() (int, BusinessResponse) {
+	return http.StatusNotFound, BusinessResponse{
+		errNotFound,
+		"User not found",
 		map[string]interface{}{},
 	}
 }

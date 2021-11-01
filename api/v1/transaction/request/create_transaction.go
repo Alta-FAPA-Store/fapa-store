@@ -8,7 +8,6 @@ type CreateTransactionRequest struct {
 	Courier       string  `json:"courier"`
 	PaymentMethod string  `json:"payment_method"`
 	TotalPrice    float32 `json:"total_price"`
-	Status        string  `json:"status"`
 }
 
 func (req *CreateTransactionRequest) ToUpSertTransactionSpec() *transaction.CreateTransactionSpec {
@@ -19,7 +18,6 @@ func (req *CreateTransactionRequest) ToUpSertTransactionSpec() *transaction.Crea
 	createTransactionSpec.Courier = req.Courier
 	createTransactionSpec.PaymentMethod = req.PaymentMethod
 	createTransactionSpec.TotalPrice = req.TotalPrice
-	createTransactionSpec.Status = req.Status
 
 	return &createTransactionSpec
 }

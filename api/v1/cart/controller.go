@@ -7,6 +7,7 @@ import (
 	"go-hexagonal/business/cart"
 	"strconv"
 
+	"github.com/golang-jwt/jwt"
 	"github.com/labstack/echo/v4"
 )
 
@@ -21,6 +22,11 @@ func NewController(service cart.Service) *Controller {
 }
 
 func (controller *Controller) FindCartByUserId(c echo.Context) error {
+	user := c.Get("user").(*jwt.Token)
+	if !user.Valid {
+		return c.JSON(common.NewForbiddenResponse())
+	}
+
 	userId, _ := strconv.Atoi(c.Param("user_id"))
 
 	cart, err := controller.service.FindCartByUserId(userId)
@@ -39,6 +45,11 @@ func (controller *Controller) FindCartByUserId(c echo.Context) error {
 }
 
 func (controller *Controller) InsertCart(c echo.Context) error {
+	user := c.Get("user").(*jwt.Token)
+	if !user.Valid {
+		return c.JSON(common.NewForbiddenResponse())
+	}
+
 	insertCartRequest := new(request.InsertCartRequest)
 
 	if err := c.Bind(insertCartRequest); err != nil {
@@ -55,6 +66,11 @@ func (controller *Controller) InsertCart(c echo.Context) error {
 }
 
 func (controller *Controller) DeleteCartDetails(c echo.Context) error {
+	user := c.Get("user").(*jwt.Token)
+	if !user.Valid {
+		return c.JSON(common.NewForbiddenResponse())
+	}
+
 	deleteCartDetailsRequest := new(request.DeleteCartDetailsRequest)
 
 	if err := c.Bind(deleteCartDetailsRequest); err != nil {
@@ -71,6 +87,11 @@ func (controller *Controller) DeleteCartDetails(c echo.Context) error {
 }
 
 func (controller *Controller) UpdateQuantityCartDetails(c echo.Context) error {
+	user := c.Get("user").(*jwt.Token)
+	if !user.Valid {
+		return c.JSON(common.NewForbiddenResponse())
+	}
+
 	updateCartDetailsResponse := new(request.UpdateCartDetailsResponse)
 
 	if err := c.Bind(updateCartDetailsResponse); err != nil {

@@ -13,7 +13,7 @@ type Repository interface {
 	GetTransactionDetails(transactionId int) (*Transaction, error)
 	CreateTransaction(transaction Transaction) (int, error)
 	UpdateTransaction(transactionId int, status string) error
-	UpdatePaymentUrlTransaction(transactionId int, paymentUrl string) error
+	UpdatePaymentUrlWithStatusTransaction(transactionId int, paymentUrl string, status string) error
 	DeleteTransaction(transactionId int) error
 	GetMidtransPaymentRequest(transactionId int, createTransactionSpec CreateTransactionSpec) (MidtransCreatePaymentRequest, error)
 }

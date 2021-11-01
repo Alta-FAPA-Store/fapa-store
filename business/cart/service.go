@@ -56,13 +56,13 @@ func (s *service) InsertCart(insertCartSpec InsertCartSpec) error {
 	cart, err := s.repository.FindCartByUserId(insertCartSpec.UserId)
 
 	if err != nil {
-		return err
+		return business.ErrUserNotFound
 	}
 
 	// Check cart user is empty or not. If empty then add a new one, if not empty then just add cart details
 	var cartId int
 	if cart == nil {
-		cart := NewCart(insertCartSpec.UserId, false, time.Now())
+		cart := NewCart(1, insertCartSpec.UserId, false, time.Now())
 
 		id, err := s.repository.InsertCart(cart)
 		cartId = id

@@ -30,6 +30,10 @@ type CartDetails struct {
 	DeletedAt gorm.DeletedAt
 }
 
+type User struct {
+	Id int
+}
+
 func newCart(cart cart.Cart) *Cart {
 	return &Cart{
 		cart.Id,
@@ -75,6 +79,7 @@ func NewGormDBRepository(db *gorm.DB) *GormRepository {
 
 func (repo *GormRepository) InsertCart(cart cart.Cart) (int, error) {
 	cartData := newCart(cart)
+	cartData.Id = 0
 
 	result := repo.DB.Create(cartData)
 	err := result.Error
@@ -100,6 +105,13 @@ func (repo *GormRepository) InsertCartDetails(cartDetail cart.CartDetails) error
 
 func (repo *GormRepository) FindCartByUserId(userId int) (*cart.Cart, error) {
 	var cartData Cart
+	var userData User
+
+	findUser := repo.DB.Table("user_tables").Select("id").Where("id = ?", userId).First(&userData)
+
+	if findUser.RowsAffected == 0 {
+		return nil, findUser.Error
+	}
 
 	findCart := repo.DB.Where("user_id = ?", userId).Where("is_checkout = ?", false).First(&cartData)
 

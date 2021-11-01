@@ -39,8 +39,9 @@ type MidtransItemDetails struct {
 	Quantity int    `json:"quantity"`
 }
 
-func NewTransaction(userId int, cartId int, courier string, paymentMethod string, paymentUrl sql.NullString, totalPrice float32, status string, createdAt time.Time) Transaction {
+func NewTransaction(id int, userId int, cartId int, courier string, paymentMethod string, paymentUrl sql.NullString, totalPrice float32, status string, createdAt time.Time) Transaction {
 	return Transaction{
+		Id:            id,
 		UserId:        userId,
 		CartId:        cartId,
 		Courier:       courier,

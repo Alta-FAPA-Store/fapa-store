@@ -54,6 +54,7 @@ func RegisterPath(e *echo.Echo, authController *auth.Controller, userController 
 
 	// Cart with versioning endpoint
 	cartV1 := e.Group("v1/cart")
+	cartV1.Use(middleware.JWTMiddleware())
 	cartV1.GET("/:user_id", cartController.FindCartByUserId)
 	cartV1.POST("", cartController.InsertCart)
 	cartV1.PUT("", cartController.UpdateQuantityCartDetails)
@@ -61,6 +62,7 @@ func RegisterPath(e *echo.Echo, authController *auth.Controller, userController 
 
 	// Transaction with versioning endpoint
 	transactionV1 := e.Group("v1/transaction")
+	transactionV1.Use(middleware.JWTMiddleware())
 	transactionV1.GET("", transactionController.GetAllTransaction)
 	transactionV1.GET("/:transaction_id", transactionController.GetTransactionDetails)
 	transactionV1.POST("", transactionController.CreateTransaction)
