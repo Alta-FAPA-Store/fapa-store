@@ -56,7 +56,7 @@ func RegisterPath(e *echo.Echo, authController *auth.Controller, userController 
 	cartV1 := e.Group("v1/cart")
 	cartV1.Use(middleware.JWTMiddleware())
 	cartV1.GET("/:user_id", cartController.FindCartByUserId)
-	cartV1.POST("", cartController.InsertCart)
+	cartV1.POST("/:user_id", cartController.InsertCart)
 	cartV1.PUT("", cartController.UpdateQuantityCartDetails)
 	cartV1.DELETE("", cartController.DeleteCartDetails)
 

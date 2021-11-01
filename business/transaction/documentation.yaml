@@ -42,19 +42,61 @@ paths:
           content:
             application/json:
               schema:
-                type: "array"
-                items:
-                  type: "object"
-                  properties:
-                    transaction_id:
-                      type: string
-                    total_price:
-                      type: number
-                      format: float
-                    courier:
-                      type: "string"
-                    status:
-                      type: string
+                type: "object"
+                properties:
+                  code:
+                    type: "string"
+                    default: "success"
+                  message:
+                    type: "string"
+                    default: "Success"
+                  data:
+                    type: "object"
+                    properties:
+                      meta:
+                        type: "object"
+                        properties:
+                          page:
+                            type: "number"
+                            default: 1
+                          row_per_page:
+                            type: "number"
+                            default: 10
+                          next_page:
+                            type: "boolean"
+                            default: false
+                          previous:
+                            type: "boolean"
+                            default: false
+                      transactions:
+                        type: "array"
+                        items:
+                          type: "object"
+                          properties:
+                            id:
+                              type: "number"
+                            user_id:
+                              type: "number"
+                            cart_id:
+                              type: "number"
+                            courier:
+                              type: "string"
+                              default: "JNE"
+                            payment_method:
+                              type: "string"
+                              default: "midtrans"
+                            payment_url:
+                              type: "string"
+                              default: "http://example.com"
+                            total_price:
+                              type: "number"
+                            status:
+                              type: "string"
+                              default: "SUCCESS"
+                            created_at:
+                              type: "string"
+                              default: "2021-11-01T12:42:14.429+07:00"
+
         
     post:
       summary: "Create transaction"
@@ -66,6 +108,12 @@ paths:
             schema:
               type: "object"
               properties:
+                user_id:
+                  type: "number"
+                  required: true
+                cart_id:
+                  type: "number"
+                  required: true
                 courier:
                   type: "string"
                   required: true
@@ -76,13 +124,23 @@ paths:
                   type: "number"
                   format: "float"
                   required: true
-                status:
-                  type: "string"
-                  default: "PENDING"
-                  required: true
       responses:
         201:
           description: "Create transaction success"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  code:
+                    type: "string"
+                    default: "success"
+                  message:
+                    type: "string"
+                    default: "Success"
+                  data:
+                    type: "string"
+                    default: "url payment midtrans"
         
   /transaction/{transactionId}:
     get:
@@ -101,19 +159,40 @@ paths:
           content:
             application/json:
               schema:
-                type: "array"
-                items:
-                  type: "object"
-                  properties:
-                    transaction_id:
-                      type: string
-                    total_price:
-                      type: number
-                      format: float
-                    courier:
-                      type: "string"
-                    status:
-                      type: string
+                type: "object"
+                properties:
+                  code:
+                    type: "string"
+                    default: "success"
+                  message:
+                    type: "string"
+                    default: "Success"
+                  data:
+                    type: "object"
+                    properties:
+                      id:
+                        type: "number"
+                      user_id:
+                        type: "number"
+                      cart_id:
+                        type: "number"
+                      courier:
+                        type: "string"
+                        default: "JNE"
+                      payment_method:
+                        type: "string"
+                        default: "bank_transfer"
+                      payment_url:
+                        type: "string"
+                        default: ""
+                      total_price:
+                        type: "number"
+                      status:
+                        type: "string"
+                        default: "PENDING"
+                      created_at:
+                        type: "string"
+                        default: "2021-11-01T12:42:14.429+07:00"
         
     put:
       summary: "Update transaction user"
@@ -135,9 +214,23 @@ paths:
                 status:
                   type: "string"
                   required: true
+                  default: "SUCCESS|FAILED|etc"
       responses:
         200:
           description: "Update transaction success"
+          content:
+            application/json:
+                schema:
+                  type: "object"
+                  properties:
+                    code:
+                      type: "string"
+                      default: "success"
+                    message:
+                      type: "string"
+                      default: "Success"
+                    data:
+                      type: "object"
     
     delete:
       summary: "Delete transaction"
@@ -152,11 +245,16 @@ paths:
       responses:
         200:
           description: "Delete transaction success"
-
-  /transaction/notification:
-    post:
-      summary: "Handle notification from third party 'MIDTRANS'"
-      description: "Handle transaction notification response from MIDTRANS after user pay using midtrans"
-      responses:
-        200:
-          description: "Handle notification success"
+          content:
+            application/json:
+                schema:
+                  type: "object"
+                  properties:
+                    code:
+                      type: "string"
+                      default: "success"
+                    message:
+                      type: "string"
+                      default: "Success"
+                    data:
+                      type: "object"

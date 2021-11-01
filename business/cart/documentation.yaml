@@ -1,0 +1,160 @@
+openapi: "3.0.0"
+info:
+  title: "Fapa-Store RESTful API"
+  description: "This is a list endpoint of Transaction Service"
+  version: "1.0.0"
+  contact:
+    name: Developer
+    email: "raygakertia1@gmail.com"
+  license:
+    name: "Apache 2.0"
+    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+servers:
+  - url: "https://staging.fapastore.com/api/v1"
+  - url: "https://fapastore.com/api/v1"
+paths:
+  /cart/{userId}:
+    get:
+      summary: "Get list cart user"
+      description: "This is a endpoint for get list of cart user."
+      responses:
+        200:
+          description: "Get list transaction success"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  code:
+                    type: "string"
+                    default: "success"
+                  message:
+                    type: "string"
+                    default: "Success"
+                  data:
+                    type: "object"
+                    properties:
+                      id:
+                        type: "number"
+                      user_id:
+                        type: "number"
+                      is_checkout:
+                        type: "boolean"
+                        default: false
+                      details:
+                        type: "array"
+                        items:
+                          type: "object"
+                          properties:
+                            cart_details_id:
+                              type: "number"
+                            product_name:
+                              type: "string"
+                              default: "Sample Product"
+                            product_price:
+                              type: number
+                              default: 100000
+                            quantity:
+                              type: number
+                              default: 1
+
+        
+    post:
+      summary: "Insert product to user cart"
+      description: "Insert product to user cart, if product already exist then it will just update the quantity of product."
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: "object"
+              properties:
+                product_id:
+                  type: "number"
+                  required: true
+      responses:
+        201:
+          description: "Get list transaction success"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  code:
+                    type: "string"
+                    default: "success"
+                  message:
+                    type: "string"
+                    default: "Success"
+                  data:
+                    type: "object"
+        
+  /cart:
+    put:
+      summary: "Update quantity of product in cart user"
+      description: "Update quantity of product in cart user"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: "object"
+              properties:
+                cart_id:
+                  type: "number"
+                  required: true
+                product_id:
+                  type: "number"
+                  required: true
+                quantity:
+                  type: "number"
+                  required: true  
+      responses:
+        200:
+          description: "Update transaction success"
+          content:
+            application/json:
+                schema:
+                  type: "object"
+                  properties:
+                    code:
+                      type: "string"
+                      default: "success"
+                    message:
+                      type: "string"
+                      default: "Success"
+                    data:
+                      type: "object"
+    
+    delete:
+      summary: "Delete product in user cart"
+      description: "Soft delete product in user cart"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: "object"
+              properties:
+                cart_id:
+                  type: "number"
+                  required: true
+                product_id:
+                  type: "number"
+                  required: true
+      responses:
+        200:
+          description: "Delete product in user cart success"
+          content:
+            application/json:
+                schema:
+                  type: "object"
+                  properties:
+                    code:
+                      type: "string"
+                      default: "success"
+                    message:
+                      type: "string"
+                      default: "Success"
+                    data:
+                      type: "object"

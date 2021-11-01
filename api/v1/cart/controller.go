@@ -50,13 +50,14 @@ func (controller *Controller) InsertCart(c echo.Context) error {
 		return c.JSON(common.NewForbiddenResponse())
 	}
 
+	userId, _ := strconv.Atoi(c.Param("user_id"))
 	insertCartRequest := new(request.InsertCartRequest)
 
 	if err := c.Bind(insertCartRequest); err != nil {
 		return c.JSON(common.NewBadRequestResponse())
 	}
 
-	err := controller.service.InsertCart(*insertCartRequest.ToUpsertCartSpec(insertCartRequest.UserId, insertCartRequest.ProductId))
+	err := controller.service.InsertCart(*insertCartRequest.ToUpsertCartSpec(userId, insertCartRequest.ProductId))
 
 	if err != nil {
 		return c.JSON(common.NewErrorBusinessResponse(err))

@@ -92,6 +92,18 @@ func (controller *Controller) UpdateTransaction(c echo.Context) error {
 		return c.JSON(common.NewForbiddenResponse())
 	}
 
+	claims := user.Claims.(jwt.MapClaims)
+
+	userRole, ok := claims["role"]
+
+	if !ok {
+		return c.JSON(common.NewForbiddenResponse())
+	}
+
+	if userRole != "admin" {
+		return c.JSON(common.NewUngrantResponse())
+	}
+
 	transactionId, _ := strconv.Atoi(c.Param("transaction_id"))
 
 	updateTransactionRequest := new(request.UpdateTransactionRequest)
@@ -113,6 +125,18 @@ func (controller *Controller) DeleteTransaction(c echo.Context) error {
 	user := c.Get("user").(*jwt.Token)
 	if !user.Valid {
 		return c.JSON(common.NewForbiddenResponse())
+	}
+
+	claims := user.Claims.(jwt.MapClaims)
+
+	userRole, ok := claims["role"]
+
+	if !ok {
+		return c.JSON(common.NewForbiddenResponse())
+	}
+
+	if userRole != "admin" {
+		return c.JSON(common.NewUngrantResponse())
 	}
 
 	transactionId, _ := strconv.Atoi(c.Param("transaction_id"))
